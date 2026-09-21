@@ -1,0 +1,141 @@
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.site-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 72px;
+  position: relative;
+}
+
+.site-header-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--color-white);
+  font-weight: 700;
+  font-size: 20px;
+}
+
+.site-header-brand img {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+}
+
+.site-header-toggle {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+}
+
+.site-header-toggle span {
+  width: 22px;
+  height: 2px;
+  background: var(--color-white);
+}
+
+.site-header-menu {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.site-header-nav {
+  display: flex;
+  gap: 24px;
+}
+
+.site-header-nav a {
+  text-decoration: none;
+  color: var(--color-white);
+  opacity: 0.8;
+  font-size: 15px;
+}
+
+.site-header-nav a:hover {
+  opacity: 1;
+}
+
+.site-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn {
+  border-radius: 30px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.btn-ghost {
+  background: none;
+  border-color: transparent;
+  color: var(--color-white);
+}
+
+.btn-outline {
+  background: none;
+  border-color: rgba(255, 255, 255, 0.3);
+  color: var(--color-white);
+}
+
+.btn-solid {
+  background: linear-gradient(180deg, var(--color-cyan), var(--color-sky-blue));
+  color: var(--color-black);
+}
+
+@media (max-width: 860px) {
+  .site-header-toggle {
+    display: flex;
+  }
+
+  .site-header-menu {
+    position: absolute;
+    top: 72px;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.95);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+    padding: 20px 24px 28px;
+    display: none;
+  }
+
+  .site-header-menu.open {
+    display: flex;
+  }
+
+  .site-header-nav {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .site-header-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .site-header-actions .btn {
+    text-align: center;
+  }
+}

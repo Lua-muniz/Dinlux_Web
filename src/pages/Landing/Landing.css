@@ -1,0 +1,133 @@
+.landing {
+  flex: 1;
+}
+
+.landing-hero {
+  background: var(--gradient-brand);
+  padding-block: 72px 96px;
+}
+
+.landing-hero-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+}
+
+.landing-hero-logo {
+  width: 160px;
+  height: 160px;
+  max-width: 40vw;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+
+.landing-hero h1 {
+  font-size: 48px;
+  font-weight: 800;
+}
+
+.landing-hero-subtitle {
+  font-size: 18px;
+  opacity: 0.9;
+  max-width: 480px;
+}
+
+.landing-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.landing-features {
+  padding-block: 64px;
+}
+
+.landing-features h2,
+.landing-download h2 {
+  font-size: 28px;
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+.landing-features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.landing-feature-card {
+  background: var(--color-card-bg);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.landing-feature-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  margin-bottom: 8px;
+}
+
+.landing-feature-card h3 {
+  font-size: 17px;
+}
+
+.landing-feature-card p {
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+.landing-download {
+  background: var(--color-gray);
+  padding-block: 56px;
+}
+
+.landing-download-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+.landing-download-inner h2 {
+  text-align: left;
+  margin-bottom: 8px;
+}
+
+.landing-download-inner p {
+  opacity: 0.75;
+}
+
+.landing-footer {
+  padding-block: 24px;
+  text-align: center;
+  font-size: 13px;
+  opacity: 0.6;
+}
+
+@media (max-width: 640px) {
+  .landing-hero {
+    padding-block: 56px 64px;
+  }
+
+  .landing-hero h1 {
+    font-size: 34px;
+  }
+
+  .landing-download-inner {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .landing-download-inner h2 {
+    text-align: center;
+  }
+}
