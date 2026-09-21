@@ -13,7 +13,9 @@
 .auth-modal {
   position: relative;
   width: 100%;
-  max-width: 380px;
+  max-width: 440px;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
   background: var(--color-gray);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--radius-lg);
@@ -46,32 +48,40 @@
   border-radius: var(--radius-sm);
 }
 
-.auth-modal-tabs {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 24px;
-  background: rgba(255, 255, 255, 0.06);
-  border-radius: var(--radius-sm);
-  padding: 4px;
+.auth-modal-title {
+  text-align: center;
+  font-size: 22px;
+  margin-bottom: 20px;
 }
 
-.auth-modal-tabs button {
-  flex: 1;
-  border: none;
-  background: transparent;
-  color: var(--color-white);
-  opacity: 0.6;
-  padding: 10px;
-  border-radius: 6px;
-  cursor: pointer;
+.auth-terms-title {
   font-size: 14px;
-  font-weight: 600;
+  margin-top: 6px;
 }
 
-.auth-modal-tabs button.active {
-  opacity: 1;
-  background: var(--color-cyan);
+.auth-terms-box {
+  height: 200px;
+  overflow-y: auto;
+  background: var(--color-white);
   color: var(--color-black);
+  border: 2px solid var(--color-black);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.auth-terms-box p {
+  margin-bottom: 10px;
+}
+
+.auth-terms-box h4 {
+  margin: 12px 0 6px;
+  font-size: 12px;
+}
+
+.auth-terms-box h4.sub {
+  font-weight: 600;
 }
 
 .auth-form {

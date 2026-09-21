@@ -8,19 +8,18 @@ import { doc, setDoc } from 'firebase/firestore'
 import { auth, db } from '../../lib/firebase'
 import { FirestoreCollections } from '../../lib/firestoreCollections'
 import { mapAuthError } from '../../lib/authErrors'
+import { TERMS_BLOCKS, TERMS_VERSION } from '../../lib/terms'
+import icon from '../../assets/icon.png'
 import './AuthModal.css'
 
 type Mode = 'login' | 'signup'
 
 type AuthModalProps = {
-  initialMode: Mode
+  mode: Mode
   onClose: () => void
 }
 
-const TERMS_VERSION = 1
-
-export default function AuthModal({ initialMode, onClose }: AuthModalProps) {
-  const [mode, setMode] = useState<Mode>(initialMode)
+export default function AuthModal({ mode, onClose }: AuthModalProps) {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -102,30 +101,9 @@ export default function AuthModal({ initialMode, onClose }: AuthModalProps) {
           ×
         </button>
 
-        <img className="auth-modal-logo" src="/favicon.png" alt="Dinlux" />
+        <img className="auth-modal-logo" src={icon} alt="Dinlux" />
 
-        <div className="auth-modal-tabs">
-          <button
-            type="button"
-            className={mode === 'login' ? 'active' : ''}
-            onClick={() => {
-              setMode('login')
-              resetFeedback()
-            }}
-          >
-            Entrar
-          </button>
-          <button
-            type="button"
-            className={mode === 'signup' ? 'active' : ''}
-            onClick={() => {
-              setMode('signup')
-              resetFeedback()
-            }}
-          >
-            Criar conta
-          </button>
-        </div>
+        <h2 className="auth-modal-title">{mode === 'login' ? 'Entrar' : 'Criar Conta'}</h2>
 
         {mode === 'login' ? (
           <form className="auth-form" onSubmit={handleLogin}>
@@ -196,13 +174,25 @@ export default function AuthModal({ initialMode, onClose }: AuthModalProps) {
                 required
               />
             </label>
+            <h3 className="auth-terms-title">Termos de Privacidade</h3>
+            <div className="auth-terms-box" tabIndex={0}>
+              {TERMS_BLOCKS.map((block, i) =>
+                block.kind === 'text' ? (
+                  <p key={i}>{block.text}</p>
+                ) : (
+                  <h4 key={i} className={block.kind}>
+                    {block.text}
+                  </h4>
+                ),
+              )}
+            </div>
             <label className="auth-form-checkbox">
               <input
                 type="checkbox"
                 checked={termsAccepted}
                 onChange={(e) => setTermsAccepted(e.target.checked)}
               />
-              Li e aceito os Termos de Privacidade
+              Li e aceito os Termos de Privacidade acima
             </label>
 
             {error && <p className="auth-form-error">{error}</p>}

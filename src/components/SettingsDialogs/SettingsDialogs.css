@@ -1,0 +1,23 @@
+.settings-dialog {
+  max-width: 480px;
+}
+
+.settings-current {
+  font-size: 14px;
+  opacity: 0.8;
+  line-height: 1.5;
+}
+
+.settings-terms {
+  height: 320px;
+  margin-bottom: 16px;
+}
+
+.settings-close {
+  width: 100%;
+}
+
+.auth-form-submit.settings-danger {
+  background: var(--color-alert-red);
+  color: var(--color-white);
+}

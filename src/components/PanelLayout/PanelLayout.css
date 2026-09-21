@@ -1,0 +1,235 @@
+.panel-loading {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.panel {
+  flex: 1;
+  display: flex;
+  min-height: 100svh;
+  background: var(--color-gray);
+}
+
+.panel-sidebar {
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+  width: 250px;
+  height: 100svh;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 20px 14px;
+  background: var(--color-black);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  z-index: 60;
+}
+
+.panel-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-inline: 10px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 20px;
+}
+
+.panel-brand img {
+  height: 36px;
+  width: auto;
+}
+
+.panel-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.panel-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  font-size: 15px;
+  opacity: 0.7;
+  transition: background 0.15s, opacity 0.15s;
+}
+
+.panel-nav-link:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.panel-nav-link.active {
+  opacity: 1;
+  font-weight: 600;
+  color: var(--color-black);
+  background: var(--color-cyan);
+}
+
+.panel-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 64px;
+  padding-inline: 32px;
+  background: rgba(27, 27, 27, 0.85);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.panel-nav-badge {
+  margin-left: auto;
+  min-width: 22px;
+  padding: 2px 7px;
+  border-radius: 11px;
+  background: var(--color-alert-red);
+  color: var(--color-white);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.panel-topbar-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.panel-icon-button,
+.panel-menu-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--color-white);
+  cursor: pointer;
+}
+
+.panel-icon-button:hover,
+.panel-menu-toggle:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.panel-menu-toggle {
+  display: none;
+}
+
+.panel-exit {
+  border-radius: 30px;
+  padding: 9px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--color-white);
+  background: transparent;
+  border: 1px solid var(--color-cyan);
+}
+
+.panel-exit:hover {
+  background: rgba(2, 230, 254, 0.12);
+}
+
+.panel-settings {
+  position: relative;
+}
+
+.panel-settings-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 230px;
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+  background: var(--color-card-bg);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+}
+
+.panel-settings-menu button {
+  text-align: left;
+  padding: 10px 12px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-white);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.panel-settings-menu button:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.panel-settings-menu button.danger {
+  color: var(--color-alert-red);
+}
+
+.panel-settings-menu hr {
+  width: 100%;
+  margin: 6px 0;
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.panel-content {
+  flex: 1;
+  padding: 32px;
+}
+
+.panel-backdrop {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .panel-sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    transform: translateX(-100%);
+    transition: transform 0.2s;
+  }
+
+  .panel-sidebar.open {
+    transform: translateX(0);
+  }
+
+  .panel-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 55;
+    background: rgba(0, 0, 0, 0.6);
+  }
+
+  .panel-menu-toggle {
+    display: inline-flex;
+  }
+
+  .panel-topbar,
+  .panel-content {
+    padding-inline: 16px;
+  }
+}

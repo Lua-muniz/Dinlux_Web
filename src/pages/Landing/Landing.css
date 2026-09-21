@@ -13,25 +13,19 @@
   align-items: center;
   text-align: center;
   gap: 16px;
+  max-width: 1440px;
 }
 
 .landing-hero-logo {
-  width: 160px;
-  height: 160px;
-  max-width: 40vw;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-card);
-}
-
-.landing-hero h1 {
-  font-size: 48px;
-  font-weight: 800;
+  width: min(512px, 92vw);
+  height: auto;
+  margin-block: -56px -48px;
 }
 
 .landing-hero-subtitle {
-  font-size: 18px;
-  opacity: 0.9;
-  max-width: 480px;
+  font-size: 22px;
+  line-height: 1.6;
+  max-width: 1200px;
 }
 
 .landing-hero-actions {
@@ -40,6 +34,34 @@
   justify-content: center;
   gap: 16px;
   margin-top: 12px;
+}
+
+.landing-about {
+  padding-block: 24px 64px;
+}
+
+.landing-about h2 {
+  font-size: 28px;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.landing-about article {
+  max-width: 900px;
+  margin: 0 auto 32px;
+}
+
+.landing-about h3 {
+  font-size: 20px;
+  margin-bottom: 12px;
+  color: var(--color-cyan);
+}
+
+.landing-about p {
+  line-height: 1.7;
+  text-align: justify;
+  opacity: 0.85;
+  margin-bottom: 14px;
 }
 
 .landing-features {
@@ -118,10 +140,6 @@
     padding-block: 56px 64px;
   }
 
-  .landing-hero h1 {
-    font-size: 34px;
-  }
-
   .landing-download-inner {
     flex-direction: column;
     text-align: center;
@@ -130,4 +148,8 @@
   .landing-download-inner h2 {
     text-align: center;
   }
+}
+
+.landing section[id] {
+  scroll-margin-top: 72px;
 }

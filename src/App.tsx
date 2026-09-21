@@ -1,16 +1,23 @@
 import { Route, Routes } from 'react-router-dom'
-import Header from './components/Header/Header'
 import Landing from './pages/Landing/Landing'
-import Dashboard from './pages/Dashboard/Dashboard'
+import PanelLayout from './components/PanelLayout/PanelLayout'
+import Home from './pages/Home/Home'
+import PanelSection from './pages/Panel/PanelSection'
+import { PANEL_SECTIONS } from './components/PanelLayout/sections'
 
 export default function App() {
   return (
-    <>
-      <Header />
-      <Routes>
-        <Route path="/" element={<Landing />} />
-        <Route path="/painel" element={<Dashboard />} />
-      </Routes>
-    </>
+    <Routes>
+      <Route path="/" element={<Landing />} />
+      <Route path="/painel" element={<PanelLayout />}>
+        {PANEL_SECTIONS.map((section) =>
+          section.path === '' ? (
+            <Route key="home" index element={<Home />} />
+          ) : (
+            <Route key={section.path} path={section.path} element={<PanelSection path={section.path} />} />
+          ),
+        )}
+      </Route>
+    </Routes>
   )
 }
