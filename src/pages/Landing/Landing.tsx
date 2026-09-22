@@ -16,7 +16,7 @@ import graficosProgressoImg from '../../assets/features/graficos-progresso.png'
 import graficosCartoesImg from '../../assets/features/graficos-cartoes.png'
 import './Landing.css'
 
-const APK_DOWNLOAD_URL = '#'
+const APK_DOWNLOAD_URL = '/downloads/dinlux.apk'
 
 type FeatureImage = { src: string; className?: string }
 
@@ -127,7 +127,7 @@ export default function Landing() {
               <button type="button" className="btn btn-light" onClick={() => setAuthMode('signup')}>
                 Criar Conta
               </button>
-              <a className="btn btn-light" href="#download">
+              <a className="btn btn-light" href={APK_DOWNLOAD_URL} download="Dinlux.apk">
                 Baixar para Android
               </a>
             </div>
@@ -192,9 +192,13 @@ export default function Landing() {
           <div className="container landing-download-inner">
             <div>
               <h2>Disponível para Android</h2>
-              <p>Baixe o aplicativo e leve o Dinlux com você.</p>
+              <p>
+                Baixe o aplicativo e leve o Dinlux com você. Como ele não está na Play Store, o
+                Android pode pedir para você permitir a instalação de fontes desconhecidas ao
+                abrir o arquivo baixado.
+              </p>
             </div>
-            <a className="btn btn-solid" href={APK_DOWNLOAD_URL} download>
+            <a className="btn btn-solid" href={APK_DOWNLOAD_URL} download="Dinlux.apk">
               Baixar para Android
             </a>
           </div>
