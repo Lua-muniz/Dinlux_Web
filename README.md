@@ -1,9 +1,9 @@
 # Dinlux Web
 
 Versão web do aplicativo Dinlux, construída com **React + TypeScript + Vite**. Reproduz as
-mesmas funcionalidades do aplicativo Android — cadastro de bancos e cartões, importação de
+mesmas funcionalidades do aplicativo Android cadastro de bancos e cartões, importação de
 extrato bancário (OFX/CSV), simulações de compras e economias, listas que viram lançamentos
-financeiros, dashboards de gráficos e o módulo de Avisos — em uma aplicação de página única (SPA)
+financeiros, dashboards de gráficos e o módulo de Avisos em uma aplicação de página única (SPA)
 acessível pelo navegador.
 
 O backend é o mesmo do aplicativo Android: **Firebase Authentication** para login/cadastro e
@@ -13,19 +13,19 @@ O backend é o mesmo do aplicativo Android: **Firebase Authentication** para log
 
 ### Estrutura do projeto
 
-- `src/pages/Landing` — página pública inicial (apresentação do produto, botão de criar conta e
+- `src/pages/Landing`: página pública inicial (apresentação do produto, botão de criar conta e
   link para baixar o `.apk` do aplicativo Android).
-- `src/pages/Panel` — layout do painel autenticado (barra lateral de navegação e barra superior
+- `src/pages/Panel`: layout do painel autenticado (barra lateral de navegação e barra superior
   com menu de configurações), montado em `/painel`.
-- `src/pages/Home` — tela inicial do painel, com os dashboards de gráficos.
-- `src/pages/Finance` — cadastro de bancos e cartões.
-- `src/pages/Simulations` — simulações de compras e economias.
-- `src/pages/Listas` — listas de tarefas/compras.
-- `src/pages/ImportExtrato` — importação de extrato bancário.
-- `src/pages/Avisos` — módulo de avisos (mestre/detalhe: lista de bancos + chat de mensagens).
-- `src/pages/Tutorial` — tutorial em slides.
-- `src/lib` — funções de acesso ao Firebase/Firestore, compartilhadas entre as páginas.
-- `src/components` — componentes reutilizáveis de UI (cabeçalho, modais etc.).
+- `src/pages/Home`: tela inicial do painel, com os dashboards de gráficos.
+- `src/pages/Finance`: cadastro de bancos e cartões.
+- `src/pages/Simulations`: simulações de compras e economias.
+- `src/pages/Listas`: listas de tarefas/compras.
+- `src/pages/ImportExtrato`: importação de extrato bancário.
+- `src/pages/Avisos`: módulo de avisos (mestre/detalhe: lista de bancos + chat de mensagens).
+- `src/pages/Tutorial`: tutorial em slides.
+- `src/lib`: funções de acesso ao Firebase/Firestore, compartilhadas entre as páginas.
+- `src/components`: componentes reutilizáveis de UI (cabeçalho, modais etc.).
 
 ### Roteamento
 
