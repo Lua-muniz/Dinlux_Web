@@ -1,0 +1,224 @@
+.sim-page {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: -20px;
+  height: calc(100svh - 120px);
+  min-height: 0;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.sim-top {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 16px;
+}
+
+.sim-create-btn {
+  flex-shrink: 0;
+  width: auto;
+  padding-inline: 24px;
+  white-space: nowrap;
+}
+
+.sim-tabs {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: visible;
+  gap: 8px;
+  padding: 6px 4px 18px;
+}
+
+.sim-tab {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  border-radius: 30px;
+  background: var(--color-black);
+  padding-right: 4px;
+}
+
+.sim-tab.inactive {
+  opacity: 0.55;
+}
+
+.sim-tab.active {
+  outline: 2px solid var(--color-cyan);
+}
+
+.sim-tab-button {
+  padding: 9px 18px;
+  border: none;
+  background: transparent;
+  color: var(--color-white);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.sim-tab-menu {
+  position: relative;
+}
+
+.sim-tab-menu-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-white);
+  opacity: 0.7;
+  cursor: pointer;
+}
+
+.sim-tab-menu-button:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.sim-tab-menu .panel-settings-menu {
+  right: 0;
+  z-index: 30;
+}
+
+.sim-add-node-btn {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  z-index: 25;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  background: var(--color-cyan);
+  color: var(--color-black);
+  cursor: pointer;
+  box-shadow: var(--shadow-card);
+}
+
+.sim-add-node-btn:hover {
+  filter: brightness(1.08);
+}
+
+.sim-canvas-area {
+  position: relative;
+  flex: 1;
+  min-height: 260px;
+  border-radius: var(--radius-md);
+  background: var(--color-gray);
+  overflow: hidden;
+}
+
+.sim-legend {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 260px;
+  max-height: 220px;
+  overflow-y: auto;
+  padding: 14px;
+  border-radius: var(--radius-md);
+  background: var(--color-card-bg);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 13px;
+  user-select: none;
+}
+
+.sim-legend-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.sim-legend-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-white);
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.sim-legend-toggle:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.sim-legend-toggle.collapsed {
+  transform: rotate(-90deg);
+}
+
+.sim-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sim-legend-item i {
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+.sim-legend-empty {
+  opacity: 0.6;
+  font-size: 12px;
+}
+
+.sim-canvas-empty {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 15;
+  opacity: 0.6;
+  text-align: center;
+  pointer-events: none;
+}
+
+.sim-progress {
+  margin-top: 10px;
+}
+
+.sim-progress-track {
+  margin-top: 6px;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--color-track-bg);
+  overflow: hidden;
+}
+
+.sim-progress-fill {
+  height: 100%;
+  background: var(--color-cyan);
+}
+
+.sim-dialog-actions {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+}

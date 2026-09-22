@@ -1,4 +1,7 @@
 import { useEffect, useState, type FormEvent, type ReactNode } from 'react'
+import { signOut } from 'firebase/auth'
+import { auth } from '../../lib/firebase'
+import PasswordInput from '../PasswordInput/PasswordInput'
 import { useAuth } from '../../context/AuthContext'
 import { mapAuthError } from '../../lib/authErrors'
 import {
@@ -67,7 +70,9 @@ function Feedback({ error, info }: { error: string | null; info: string | null }
   )
 }
 
-function NameDialog({ onClose }: { onClose: () => void }) {
+type DialogProps = { onClose: () => void; onNotify: (message: string) => void }
+
+function NameDialog({ onClose, onNotify }: DialogProps) {
   const { user, profile } = useAuth()
   const [name, setName] = useState('')
   const { error, info, submitting, run, setError } = useSubmit()
@@ -79,7 +84,8 @@ function NameDialog({ onClose }: { onClose: () => void }) {
     if (!user) return
     run(async () => {
       await updateName(user.uid, trimmed)
-      return 'Nome alterado com sucesso'
+      onNotify('Nome alterado com sucesso')
+      onClose()
     })
   }
 
@@ -100,13 +106,13 @@ function NameDialog({ onClose }: { onClose: () => void }) {
   )
 }
 
-function EmailDialog({ onClose }: { onClose: () => void }) {
+function EmailDialog({ onClose }: DialogProps) {
   const { user } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const { error, info, submitting, run, setError } = useSubmit()
 
-  function handleSubmit(event: FormEvent) {
+  function handleSend(event: FormEvent) {
     event.preventDefault()
     const trimmed = email.trim()
     if (!EMAIL_PATTERN.test(trimmed)) return setError('Formato de e-mail inválido')
@@ -114,13 +120,14 @@ function EmailDialog({ onClose }: { onClose: () => void }) {
     if (trimmed === user.email) return setError('Este já é o seu e-mail atual')
     run(async () => {
       await requestEmailChange(user, trimmed, password)
-      return 'E-mail de confirmação enviado para o novo endereço! Verifique sua caixa de entrada.'
+      onClose()
+      await signOut(auth)
     })
   }
 
   return (
     <Dialog title="Alterar Email" onClose={onClose}>
-      <form className="auth-form" onSubmit={handleSubmit}>
+      <form className="auth-form" onSubmit={handleSend}>
         <p className="settings-current">{user?.email}</p>
         <label>
           Novo e-mail
@@ -128,18 +135,18 @@ function EmailDialog({ onClose }: { onClose: () => void }) {
         </label>
         <label>
           Senha atual
-          <input type="password" value={password} onChange={(event) => setPassword(event.target.value)} required />
+          <PasswordInput value={password} onChange={(event) => setPassword(event.target.value)} required />
         </label>
         <Feedback error={error} info={info} />
         <button type="submit" className="auth-form-submit" disabled={submitting}>
-          {submitting ? 'Enviando…' : 'Salvar'}
+          {submitting ? 'Enviando…' : 'Enviar Link'}
         </button>
       </form>
     </Dialog>
   )
 }
 
-function PasswordDialog({ onClose }: { onClose: () => void }) {
+function PasswordDialog({ onClose, onNotify }: DialogProps) {
   const { user } = useAuth()
   const [current, setCurrent] = useState('')
   const [next, setNext] = useState('')
@@ -154,7 +161,8 @@ function PasswordDialog({ onClose }: { onClose: () => void }) {
     if (!user) return
     run(async () => {
       await changePassword(user, current, next)
-      return 'Senha alterada com sucesso!'
+      onNotify('Senha alterada com sucesso!')
+      onClose()
     })
   }
 
@@ -163,15 +171,15 @@ function PasswordDialog({ onClose }: { onClose: () => void }) {
       <form className="auth-form" onSubmit={handleSubmit}>
         <label>
           Senha atual
-          <input type="password" value={current} onChange={(event) => setCurrent(event.target.value)} required />
+          <PasswordInput value={current} onChange={(event) => setCurrent(event.target.value)} required />
         </label>
         <label>
           Nova senha
-          <input type="password" value={next} onChange={(event) => setNext(event.target.value)} required />
+          <PasswordInput value={next} onChange={(event) => setNext(event.target.value)} required />
         </label>
         <label>
           Confirmar nova senha
-          <input type="password" value={confirm} onChange={(event) => setConfirm(event.target.value)} required />
+          <PasswordInput value={confirm} onChange={(event) => setConfirm(event.target.value)} required />
         </label>
         <Feedback error={error} info={info} />
         <button type="submit" className="auth-form-submit" disabled={submitting}>
@@ -226,7 +234,7 @@ function PrivacyDialog({ onClose }: { onClose: () => void }) {
   )
 }
 
-function ExportDialog({ onClose }: { onClose: () => void }) {
+function ExportDialog({ onClose, onNotify }: DialogProps) {
   const { user } = useAuth()
   const { error, info, submitting, run } = useSubmit()
 
@@ -239,7 +247,8 @@ function ExportDialog({ onClose }: { onClose: () => void }) {
       } else {
         downloadFile(await buildPdf(data), exportFilename('pdf'), 'application/pdf')
       }
-      return 'Seus dados foram exportados com sucesso.'
+      onNotify('Seus dados foram exportados com sucesso.')
+      onClose()
     })
   }
 
@@ -280,7 +289,7 @@ function DeleteDialog({ onClose }: { onClose: () => void }) {
         </p>
         <label>
           Digite sua senha atual para confirmar
-          <input type="password" value={password} onChange={(event) => setPassword(event.target.value)} required />
+          <PasswordInput value={password} onChange={(event) => setPassword(event.target.value)} required />
         </label>
         <Feedback error={error} info={null} />
         <button type="submit" className="auth-form-submit settings-danger" disabled={submitting}>
@@ -294,18 +303,18 @@ function DeleteDialog({ onClose }: { onClose: () => void }) {
   )
 }
 
-export default function SettingsDialogs({ kind, onClose }: { kind: SettingsDialogKind; onClose: () => void }) {
+export default function SettingsDialogs({ kind, onClose, onNotify }: DialogProps & { kind: SettingsDialogKind }) {
   switch (kind) {
     case 'name':
-      return <NameDialog onClose={onClose} />
+      return <NameDialog onClose={onClose} onNotify={onNotify} />
     case 'email':
-      return <EmailDialog onClose={onClose} />
+      return <EmailDialog onClose={onClose} onNotify={onNotify} />
     case 'password':
-      return <PasswordDialog onClose={onClose} />
+      return <PasswordDialog onClose={onClose} onNotify={onNotify} />
     case 'privacy':
       return <PrivacyDialog onClose={onClose} />
     case 'export':
-      return <ExportDialog onClose={onClose} />
+      return <ExportDialog onClose={onClose} onNotify={onNotify} />
     case 'delete':
       return <DeleteDialog onClose={onClose} />
   }

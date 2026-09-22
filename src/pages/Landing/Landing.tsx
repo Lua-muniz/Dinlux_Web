@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import logoFull from '../../assets/logo-full.png'
 import AuthModal from '../../components/AuthModal/AuthModal'
 import Header from '../../components/Header/Header'
 import { useAuth } from '../../context/AuthContext'
+import { clearEmailChangeRequested, wasEmailChangeRequested } from '../../lib/emailChangeNotice'
 import './Landing.css'
 
 const APK_DOWNLOAD_URL = '#'
@@ -40,7 +41,12 @@ const ABOUT = [
 
 export default function Landing() {
   const { user, loading } = useAuth()
-  const [authMode, setAuthMode] = useState<'login' | 'signup' | null>(null)
+  const [emailChanged] = useState(wasEmailChangeRequested)
+  const [authMode, setAuthMode] = useState<'login' | 'signup' | null>(emailChanged ? 'login' : null)
+
+  useEffect(() => {
+    if (emailChanged) clearEmailChangeRequested()
+  }, [emailChanged])
 
   if (!loading && user) {
     return <Navigate to="/painel" replace />
@@ -119,7 +125,11 @@ export default function Landing() {
         </footer>
       </main>
 
-      {authMode && <AuthModal mode={authMode} onClose={() => setAuthMode(null)} />}
+      {authMode && <AuthModal
+          mode={authMode}
+          onClose={() => setAuthMode(null)}
+          notice={emailChanged ? 'Enviamos um link de confirmação para o novo e-mail. Depois de clicar nele, entre com o novo endereço e sua senha.' : undefined}
+        />}
     </>
   )
 }

@@ -5,6 +5,7 @@ import {
   signInWithEmailAndPassword,
 } from 'firebase/auth'
 import { doc, setDoc } from 'firebase/firestore'
+import PasswordInput from '../PasswordInput/PasswordInput'
 import { auth, db } from '../../lib/firebase'
 import { FirestoreCollections } from '../../lib/firestoreCollections'
 import { mapAuthError } from '../../lib/authErrors'
@@ -17,16 +18,17 @@ type Mode = 'login' | 'signup'
 type AuthModalProps = {
   mode: Mode
   onClose: () => void
+  notice?: string
 }
 
-export default function AuthModal({ mode, onClose }: AuthModalProps) {
+export default function AuthModal({ mode, onClose, notice }: AuthModalProps) {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [termsAccepted, setTermsAccepted] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [info, setInfo] = useState<string | null>(null)
+  const [info, setInfo] = useState<string | null>(notice ?? null)
   const [submitting, setSubmitting] = useState(false)
 
   function resetFeedback() {
@@ -118,9 +120,7 @@ export default function AuthModal({ mode, onClose }: AuthModalProps) {
             </label>
             <label>
               Senha
-              <input
-                type="password"
-                value={password}
+              <PasswordInput value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
@@ -158,18 +158,14 @@ export default function AuthModal({ mode, onClose }: AuthModalProps) {
             </label>
             <label>
               Senha
-              <input
-                type="password"
-                value={password}
+              <PasswordInput value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
             </label>
             <label>
               Confirmar senha
-              <input
-                type="password"
-                value={confirmPassword}
+              <PasswordInput value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
               />

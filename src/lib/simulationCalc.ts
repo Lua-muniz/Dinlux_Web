@@ -45,6 +45,40 @@ function purchaseStartMonth(createdAt: number, method: 'DEBIT' | 'CREDIT', closi
   return created.getDate() <= closingDay ? createdMonth : createdMonth + 1
 }
 
+export function monthLabel(index: number): string {
+  const month = String((index % 12) + 1).padStart(2, '0')
+  return `${month}/${Math.floor(index / 12)}`
+}
+
+export function purchaseStartMonthIndex(createdAt: number, method: 'DEBIT' | 'CREDIT', closingDay: number): number {
+  return purchaseStartMonth(createdAt, method, closingDay)
+}
+
+export function purchaseEndMonthIndex(startMonth: number, installments: number): number {
+  return startMonth + Math.max(installments - 1, 0)
+}
+
+export function installmentValue(totalValue: number, installments: number, monthlyRatePercent: number): number {
+  if (installments <= 0) return totalValue
+  if (monthlyRatePercent <= 0) return totalValue / installments
+  const rate = monthlyRatePercent / 100
+  const factor = rate / (1 - Math.pow(1 + rate, -installments))
+  return totalValue * factor
+}
+
+export function totalWithInterest(installment: number, installments: number): number {
+  return installment * installments
+}
+
+export function monthsBetween(start: Date, end: Date): number {
+  const months = monthIndex(end) - monthIndex(start) + 1
+  return Math.max(months, 1)
+}
+
+export function monthlySavingsAmount(target: number, start: Date, end: Date): number {
+  return target / monthsBetween(start, end)
+}
+
 export function savingsPeriods(entry: SimulationEntry, today: Date): Period[] {
   const start = monthIndex(new Date(entry.startDate))
   const end = monthIndex(new Date(entry.endDate))

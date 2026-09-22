@@ -31,13 +31,16 @@ export type Simulation = {
 export type SimulationEntry = {
   id: string
   simulationId: string
+  groupId: string
   type: 'PURCHASE' | 'SAVINGS'
   title: string
   paymentMethod: 'DEBIT' | 'CREDIT' | null
   bankId: string
+  bankName: string
   cardId: string
   cardLabel: string
   cardClosingDay: number
+  totalValue: number
   installments: number
   installmentValue: number
   paidInstallments: number
@@ -55,6 +58,8 @@ export type SimulationEntry = {
 export type StatementTransaction = {
   id: string
   bankId: string
+  date: number
+  description: string
   amount: number
   credit: boolean
 }
@@ -113,13 +118,16 @@ export async function loadEntries(uid: string, simulationId: string): Promise<Si
       return {
         id: doc.id,
         simulationId: data.simulationId ?? '',
+        groupId: data.groupId ?? '',
         type: data.type ?? 'PURCHASE',
         title: data.title ?? '',
         paymentMethod: data.paymentMethod ?? null,
         bankId: data.bankId ?? '',
+        bankName: data.bankName ?? '',
         cardId: data.cardId ?? '',
         cardLabel: data.cardLabel ?? '',
         cardClosingDay: data.cardClosingDay ?? 0,
+        totalValue: data.totalValue ?? 0,
         installments: data.installments ?? 1,
         installmentValue: data.installmentValue ?? 0,
         paidInstallments: data.paidInstallments ?? 0,
@@ -153,6 +161,8 @@ export async function loadTransactions(uid: string, bankId: string): Promise<Sta
     return {
       id: doc.id,
       bankId: data.bankId ?? '',
+      date: data.date ?? 0,
+      description: data.description ?? '',
       amount: data.amount ?? 0,
       credit: data.credit ?? false,
     }

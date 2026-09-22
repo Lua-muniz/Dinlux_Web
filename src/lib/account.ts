@@ -5,9 +5,10 @@ import {
   verifyBeforeUpdateEmail,
   type User,
 } from 'firebase/auth'
-import { collection, deleteDoc, doc, getDoc, getDocs, query, setDoc, where, writeBatch } from 'firebase/firestore'
+import { collection, deleteDoc, doc, getDoc, getDocs, setDoc, writeBatch } from 'firebase/firestore'
 import { auth, db } from './firebase'
 import { FirestoreCollections } from './firestoreCollections'
+import { markEmailChangeRequested } from './emailChangeNotice'
 
 async function reauthenticate(user: User, password: string) {
   if (!user.email) throw new Error('Usuário não autenticado')
@@ -23,11 +24,9 @@ export async function updateName(uid: string, name: string) {
 }
 
 export async function requestEmailChange(user: User, newEmail: string, password: string) {
-  const existing = await getDocs(query(collection(db, FirestoreCollections.USERS), where('email', '==', newEmail)))
-  if (!existing.empty) throw new Error('Este e-mail já está em uso')
-
   await reauthenticate(user, password)
   await verifyBeforeUpdateEmail(user, newEmail)
+  markEmailChangeRequested(user.email ?? '')
 }
 
 export async function changePassword(user: User, currentPassword: string, newPassword: string) {

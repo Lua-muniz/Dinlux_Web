@@ -40,12 +40,13 @@ function Icon({ d }: { d: string }) {
 }
 
 export default function PanelLayout() {
-  const { user, loading } = useAuth()
+  const { user, profile, loading } = useAuth()
   const { pathname } = useLocation()
   const [unseenAlerts, setUnseenAlerts] = useState(0)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [dialog, setDialog] = useState<SettingsDialogKind | null>(null)
+  const [toast, setToast] = useState<string | null>(null)
   const settingsRef = useRef<HTMLDivElement>(null)
 
   const uid = user?.uid
@@ -62,6 +63,12 @@ export default function PanelLayout() {
       cancelled = true
     }
   }, [uid, pathname])
+
+  useEffect(() => {
+    if (!toast) return
+    const timer = setTimeout(() => setToast(null), 8000)
+    return () => clearTimeout(timer)
+  }, [toast])
 
   useEffect(() => {
     if (user) syncEmailWithAuth(user).catch(() => {})
@@ -113,6 +120,7 @@ export default function PanelLayout() {
             </NavLink>
           ))}
         </nav>
+        <span className="panel-sidebar-greeting">Olá{profile?.nome ? `, ${profile.nome}` : ''}</span>
       </aside>
       {sidebarOpen && <div className="panel-backdrop" onClick={() => setSidebarOpen(false)} />}
 
@@ -164,7 +172,8 @@ export default function PanelLayout() {
         </main>
       </div>
 
-      {dialog && <SettingsDialogs kind={dialog} onClose={() => setDialog(null)} />}
+      {dialog && <SettingsDialogs kind={dialog} onClose={() => setDialog(null)} onNotify={setToast} />}
+      {toast && <div className="panel-toast" role="status">{toast}</div>}
     </div>
   )
 }

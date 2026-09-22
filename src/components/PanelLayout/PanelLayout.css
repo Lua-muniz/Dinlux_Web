@@ -233,3 +233,30 @@
     padding-inline: 16px;
   }
 }
+
+.panel-sidebar-greeting {
+  margin-top: auto;
+  align-self: flex-start;
+  padding-inline: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.panel-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 120;
+  max-width: calc(100vw - 32px);
+  padding: 12px 20px;
+  border-radius: var(--radius-md);
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-income);
+  box-shadow: var(--shadow-card);
+  font-size: 14px;
+}
