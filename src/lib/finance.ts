@@ -56,6 +56,10 @@ export async function renameBank(uid: string, bankId: string, name: string) {
   await updateDoc(bankRef(uid, bankId), { name })
 }
 
+export async function updateBankCode(uid: string, bankId: string, bankCode: string) {
+  await updateDoc(bankRef(uid, bankId), { bankCode })
+}
+
 export async function saveCards(uid: string, bankId: string, cards: Card[]) {
   await updateDoc(bankRef(uid, bankId), { cards: cards.map(serializeCard) })
 }

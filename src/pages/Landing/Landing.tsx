@@ -1,20 +1,60 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import logoFull from '../../assets/logo-full.png'
 import AuthModal from '../../components/AuthModal/AuthModal'
 import Header from '../../components/Header/Header'
 import { useAuth } from '../../context/AuthContext'
 import { clearEmailChangeRequested, wasEmailChangeRequested } from '../../lib/emailChangeNotice'
+import contasCartoesImg from '../../assets/features/contas-cartoes.png'
+import extratosImg from '../../assets/features/extratos.png'
+import simulacoesImg from '../../assets/features/simulacoes.png'
+import listasImg from '../../assets/features/listas.png'
+import avisos1Img from '../../assets/features/avisos-1.png'
+import avisos2Img from '../../assets/features/avisos-2.png'
+import graficosBancosImg from '../../assets/features/graficos-bancos.png'
+import graficosProgressoImg from '../../assets/features/graficos-progresso.png'
+import graficosCartoesImg from '../../assets/features/graficos-cartoes.png'
 import './Landing.css'
 
 const APK_DOWNLOAD_URL = '#'
 
-const FEATURES = [
-  { title: 'Contas e cartões', color: 'var(--color-cyan)' },
-  { title: 'Extratos', color: 'var(--color-sky-blue)' },
-  { title: 'Simulações', color: 'var(--color-income)' },
-  { title: 'Listas', color: 'var(--color-warning)' },
-  { title: 'Avisos', color: 'var(--color-alert-red)' },
+type FeatureImage = { src: string; className?: string }
+
+const FEATURES: { title: string; images: FeatureImage[]; text: string }[] = [
+  {
+    title: 'Contas e cartões',
+    images: [{ src: contasCartoesImg }],
+    text: 'Cadastre seus bancos e cartões e acompanhe o saldo de cada um. Para os cartões, veja limite, limite disponível, dia de fechamento e de vencimento, navegando entre eles com as setas.',
+  },
+  {
+    title: 'Extratos',
+    images: [{ src: extratosImg }],
+    text: 'Importe os extratos bancários (OFX ou CSV) e veja todas as movimentações organizadas em uma tabela, com data, valor e descrição de cada lançamento.',
+  },
+  {
+    title: 'Simulações',
+    images: [{ src: simulacoesImg, className: 'landing-feature-image-shrink' }],
+    text: 'Monte simulações de compras parceladas ou metas de economia organizadas em grupos, em um canvas visual onde você posiciona e conecta cada uma delas.',
+  },
+  {
+    title: 'Listas',
+    images: [{ src: listasImg }],
+    text: 'Crie listas de compras ou tarefas, marque os itens já feitos e acompanhe quanto do total já foi gasto e quanto ainda falta.',
+  },
+  {
+    title: 'Avisos',
+    images: [{ src: avisos1Img }, { src: avisos2Img }],
+    text: 'Para cada parcela ou economia cadastrada, o Dinlux avisa mês a mês se ela está confirmada, pendente ou atrasada, com o saldo do banco e o limite usado do cartão sempre visíveis no topo.',
+  },
+  {
+    title: 'Gráficos',
+    images: [
+      { src: graficosBancosImg },
+      { src: graficosProgressoImg, className: 'landing-feature-image-grow' },
+      { src: graficosCartoesImg, className: 'landing-feature-image-grow' },
+    ],
+    text: 'Acompanhe o progresso de cada simulação em gráficos de barras e o progresso geral de todas elas em uma linha do tempo. Para os cartões, um gráfico de rosca mostra de forma clara quanto do limite já foi usado e quanto ainda está disponível.',
+  },
 ]
 
 const ABOUT = [
@@ -43,6 +83,23 @@ export default function Landing() {
   const { user, loading } = useAuth()
   const [emailChanged] = useState(wasEmailChangeRequested)
   const [authMode, setAuthMode] = useState<'login' | 'signup' | null>(emailChanged ? 'login' : null)
+  const featuresTrackRef = useRef<HTMLDivElement>(null)
+
+  function scrollFeatures(direction: 1 | -1) {
+    const track = featuresTrackRef.current
+    if (!track) return
+    const card = track.querySelector('.landing-feature-card')
+    const step = card ? card.clientWidth + 32 : 320
+    track.scrollBy({ left: direction * step, behavior: 'smooth' })
+  }
+
+  useLayoutEffect(() => {
+    // O navegador pode restaurar o scroll horizontal do carrossel entre recarregamentos;
+    // força sempre iniciar em "Contas e cartões" (primeiro card).
+    if (featuresTrackRef.current) {
+      featuresTrackRef.current.scrollLeft = 0
+    }
+  }, [])
 
   useEffect(() => {
     if (emailChanged) clearEmailChangeRequested()
@@ -80,15 +137,40 @@ export default function Landing() {
         <section id="recursos" className="landing-features">
           <div className="container">
             <h2>Recursos</h2>
-            <div className="landing-features-grid">
+          </div>
+
+          <div className="landing-carousel">
+            <button
+              type="button"
+              className="landing-carousel-arrow landing-carousel-arrow-left"
+              onClick={() => scrollFeatures(-1)}
+              aria-label="Recurso anterior"
+            >
+              <span className="landing-carousel-arrow-icon landing-carousel-arrow-icon-left" />
+            </button>
+
+            <div className="landing-carousel-track" ref={featuresTrackRef}>
               {FEATURES.map((feature) => (
-                <div className="landing-feature-card" key={feature.title}>
-                  <span className="landing-feature-dot" style={{ background: feature.color }} />
+                <article className="landing-feature-card" key={feature.title}>
                   <h3>{feature.title}</h3>
-                  <p>Texto em breve.</p>
-                </div>
+                  <p>{feature.text}</p>
+                  <div className="landing-feature-images">
+                    {feature.images.map((image) => (
+                      <img key={image.src} src={image.src} className={image.className} alt={feature.title} />
+                    ))}
+                  </div>
+                </article>
               ))}
             </div>
+
+            <button
+              type="button"
+              className="landing-carousel-arrow landing-carousel-arrow-right"
+              onClick={() => scrollFeatures(1)}
+              aria-label="Próximo recurso"
+            >
+              <span className="landing-carousel-arrow-icon landing-carousel-arrow-icon-right" />
+            </button>
           </div>
         </section>
 

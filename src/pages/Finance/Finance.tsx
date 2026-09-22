@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
+import DropdownMenu, { type DropdownMenuItem } from '../../components/DropdownMenu/DropdownMenu'
 import { formatCurrency } from '../../components/Charts/Charts'
 import {
   loadActiveEntries,
@@ -34,8 +35,6 @@ type Dialog =
   | 'available'
   | 'deleteCard'
 
-type MenuItem = { label: string; danger?: boolean; onSelect: () => void }
-
 const DOTS = 'M5 12h.01M12 12h.01M19 12h.01'
 const GEAR =
   'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3h0a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9v0a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z'
@@ -60,44 +59,8 @@ function Icon({ d }: { d: string }) {
   )
 }
 
-function ActionMenu({ label, icon, items }: { label: string; icon: string; items: MenuItem[] }) {
-  const [open, setOpen] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (!open) return
-    function handleClick(event: MouseEvent) {
-      if (!ref.current?.contains(event.target as Node)) setOpen(false)
-    }
-    document.addEventListener('mousedown', handleClick)
-    return () => document.removeEventListener('mousedown', handleClick)
-  }, [open])
-
-  return (
-    <div className="finance-menu" ref={ref}>
-      <button type="button" className="finance-icon-button" aria-label={label} aria-expanded={open} onClick={() => setOpen(!open)}>
-        <Icon d={icon} />
-      </button>
-      {open && (
-        <div className="panel-settings-menu finance-menu-list" role="menu">
-          {items.map((item) => (
-            <button
-              key={item.label}
-              type="button"
-              role="menuitem"
-              className={item.danger ? 'danger' : ''}
-              onClick={() => {
-                setOpen(false)
-                item.onSelect()
-              }}
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  )
+function ActionMenu({ label, icon, items }: { label: string; icon: string; items: DropdownMenuItem[] }) {
+  return <DropdownMenu label={label} icon={icon} items={items} align="right" />
 }
 
 function Stepper({ label, disabled, direction, onClick }: { label: string; disabled: boolean; direction: 'left' | 'right'; onClick: () => void }) {
@@ -181,14 +144,14 @@ export default function Finance() {
   const available = card ? availableCardLimit(card.limit, cardPurchases, card.usedAmount) : 0
   const showAvailable = card !== undefined && (cardPurchases.length > 0 || card.usedAmount > 0)
 
-  const bankMenu: MenuItem[] = [
+  const bankMenu: DropdownMenuItem[] = [
     { label: 'Renomear', onSelect: () => setDialog('renameBank') },
     { label: 'Criar', onSelect: () => setDialog('newBank') },
     { label: 'Excluir Extrato', onSelect: () => setDialog('deleteStatement') },
     { label: 'Excluir', danger: true, onSelect: () => setDialog('deleteBank') },
   ]
 
-  const cardMenu: MenuItem[] = card
+  const cardMenu: DropdownMenuItem[] = card
     ? [
         { label: 'Editar', onSelect: () => setDialog('editCard') },
         { label: 'Criar', onSelect: () => setDialog('newCard') },

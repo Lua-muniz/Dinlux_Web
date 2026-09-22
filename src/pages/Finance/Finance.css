@@ -187,18 +187,39 @@
 
 .finance-form-row {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 12px;
+}
+
+.finance-form-row > label,
+.finance-form-row > .auth-form-checkbox {
+  min-width: 0;
 }
 
 .finance-card-fieldset {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 10px;
   margin: 0;
-  padding: 14px;
+  padding: 12px;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: var(--radius-sm);
+}
+
+.finance-card-fieldset .finance-form-row {
+  gap: 10px;
+}
+
+.finance-card-fieldset label {
+  gap: 4px;
+}
+
+.finance-card-fieldset .auth-form-checkbox {
+  margin: 0;
+}
+
+.finance-interest-row {
+  align-items: center;
 }
 
 .finance-card-fieldset legend {
@@ -208,6 +229,8 @@
 }
 
 .auth-form select {
+  width: 100%;
+  min-width: 0;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: var(--radius-sm);

@@ -1,0 +1,58 @@
+.extrato {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  width: 100%;
+  height: 100%;
+}
+
+.extrato-dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 480px;
+  margin-inline: auto;
+  margin-block: auto;
+  padding: 40px 24px;
+  border: 2px dashed rgba(255, 255, 255, 0.25);
+  border-radius: var(--radius-md);
+  text-align: center;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.extrato-dropzone.drag-over {
+  border-color: var(--color-cyan);
+  background: rgba(2, 230, 254, 0.08);
+}
+
+.extrato-dropzone-hint {
+  font-size: 13px;
+  opacity: 0.65;
+}
+
+.extrato-file-input {
+  display: none;
+}
+
+.extrato-success {
+  margin-top: 12px;
+  text-align: center;
+  color: var(--color-income);
+}
+
+.extrato-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 16px;
+  font-size: 14px;
+}
+
+.extrato-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}

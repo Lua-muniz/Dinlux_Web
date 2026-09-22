@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type WheelEvent } from 'react'
+import { useCallback, useEffect, useMemo, useState, type WheelEvent } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import Modal from '../../components/Modal/Modal'
 import { TextDialog, ConfirmDialog } from '../Finance/FinanceDialogs'
@@ -21,6 +21,7 @@ import {
 } from '../../lib/simulations'
 import SimulationCanvas from './SimulationCanvas'
 import { CreateEntryDialog, EditPurchaseTitleDialog, EditSavingsDialog, NodeDetailsDialog } from './EntryDialogs'
+import DropdownMenu from '../../components/DropdownMenu/DropdownMenu'
 import './Simulations.css'
 
 const PLUS_ICON = 'M12 5v14M5 12h14'
@@ -41,38 +42,20 @@ function SimulationMenu({ simulation, onRename, onDelete, onToggleActive }: {
   onDelete: () => void
   onToggleActive: () => void
 }) {
-  const [open, setOpen] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (!open) return
-    function handleClick(event: MouseEvent) {
-      if (!ref.current?.contains(event.target as Node)) setOpen(false)
-    }
-    document.addEventListener('mousedown', handleClick)
-    return () => document.removeEventListener('mousedown', handleClick)
-  }, [open])
-
   return (
-    <div className="sim-tab-menu" ref={ref}>
-      <button type="button" className="sim-tab-menu-button" aria-label="Opções da simulação" onClick={(event) => { event.stopPropagation(); setOpen(!open) }}>
-        <Icon d={DOTS_ICON} />
-      </button>
-      {open && (
-        <div className="panel-settings-menu" role="menu">
-          <button type="button" role="menuitem" onClick={() => { setOpen(false); onRename() }}>
-            Renomear
-          </button>
-          <button type="button" role="menuitem" onClick={() => { setOpen(false); onToggleActive() }}>
-            {simulation.active ? 'Desativar' : 'Ativar'}
-          </button>
-          <hr />
-          <button type="button" role="menuitem" className="danger" onClick={() => { setOpen(false); onDelete() }}>
-            Excluir
-          </button>
-        </div>
-      )}
-    </div>
+    <DropdownMenu
+      label="Opções da simulação"
+      icon={DOTS_ICON}
+      align="left"
+      buttonClassName="sim-tab-menu-button"
+      iconSize={18}
+      iconStrokeWidth={2}
+      items={[
+        { label: 'Renomear', onSelect: onRename },
+        { label: simulation.active ? 'Desativar' : 'Ativar', onSelect: onToggleActive },
+        { label: 'Excluir', danger: true, onSelect: onDelete },
+      ]}
+    />
   )
 }
 
@@ -176,6 +159,9 @@ export default function Simulations() {
   )
   const legendColors = useMemo(() => resolveColors(legendRows.map((row) => row.id)), [legendRows])
 
+  const activeSimulations = useMemo(() => simulations.filter((simulation) => simulation.active), [simulations])
+  const inactiveSimulations = useMemo(() => simulations.filter((simulation) => !simulation.active), [simulations])
+
   if (status === 'loading') return <p className="home-status">Carregando…</p>
   if (status === 'error') return <p className="home-status">Não foi possível carregar os dados.</p>
   if (!uid) return null
@@ -208,23 +194,29 @@ export default function Simulations() {
     element.scrollLeft += event.deltaY
   }
 
+  function renderTab(simulation: Simulation) {
+    return (
+      <div key={simulation.id} className={`sim-tab ${selectedId === simulation.id ? 'active' : ''} ${simulation.active ? '' : 'inactive'}`}>
+        <button type="button" className="sim-tab-button" onClick={() => setSelectedId(simulation.id)}>
+          {simulation.title}
+        </button>
+        <SimulationMenu
+          simulation={simulation}
+          onRename={() => handleRenameSimulation(simulation)}
+          onDelete={() => setDeleteTarget(simulation)}
+          onToggleActive={() => handleToggleActive(simulation)}
+        />
+      </div>
+    )
+  }
+
   return (
     <div className="sim-page">
       <div className="sim-top">
         <div className="sim-tabs" onWheel={handleTabsWheel}>
-          {simulations.map((simulation) => (
-            <div key={simulation.id} className={`sim-tab ${selectedId === simulation.id ? 'active' : ''} ${simulation.active ? '' : 'inactive'}`}>
-              <button type="button" className="sim-tab-button" onClick={() => setSelectedId(simulation.id)}>
-                {simulation.title}
-              </button>
-              <SimulationMenu
-                simulation={simulation}
-                onRename={() => handleRenameSimulation(simulation)}
-                onDelete={() => setDeleteTarget(simulation)}
-                onToggleActive={() => handleToggleActive(simulation)}
-              />
-            </div>
-          ))}
+          {activeSimulations.map(renderTab)}
+          {activeSimulations.length > 0 && inactiveSimulations.length > 0 && <div className="sim-tabs-divider" aria-hidden="true" />}
+          {inactiveSimulations.map(renderTab)}
         </div>
         <button type="button" className="auth-form-submit sim-create-btn" onClick={() => setCreateOpen(true)}>
           Criar Simulação

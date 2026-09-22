@@ -1,4 +1,4 @@
-import { useRef, useState, type MouseEvent as ReactMouseEvent, type WheelEvent as ReactWheelEvent } from 'react'
+import { useEffect, useRef, useState, type MouseEvent as ReactMouseEvent, type WheelEvent as ReactWheelEvent } from 'react'
 import type { SimulationEntry } from '../../lib/dinluxData'
 import type { SimulationGroup } from '../../lib/simulations'
 import { buildCanvasLayout, isCompatibleGroup, CANVAS_GROUP_LABEL_RESERVE, CANVAS_NODE_TEXT_SIZE_TWO_LINES } from './canvasLayout'
@@ -6,6 +6,7 @@ import './SimulationCanvas.css'
 
 const MIN_SCALE = 0.5
 const MAX_SCALE = 3
+const DRAG_THRESHOLD_PX = 4
 
 export default function SimulationCanvas({
   groups,
@@ -22,13 +23,87 @@ export default function SimulationCanvas({
   onGroupClick: (group: SimulationGroup) => void
   onNodeMoved: (entry: SimulationEntry, group: SimulationGroup) => void
 }) {
+  const viewportRef = useRef<HTMLDivElement>(null)
   const [transform, setTransform] = useState({ scale: 1, x: 40, y: 20 })
+  const [dragPoint, setDragPoint] = useState<{ x: number; y: number } | null>(null)
   const [draggingId, setDraggingId] = useState<string | null>(null)
   const [dropTargetId, setDropTargetId] = useState<string | null>(null)
   const panState = useRef<{ x: number; y: number; startX: number; startY: number } | null>(null)
-  const draggedEntry = useRef<SimulationEntry | null>(null)
+
+  const nodeDragState = useRef<{
+    entry: SimulationEntry
+    startClientX: number
+    startClientY: number
+    moved: boolean
+  } | null>(null)
 
   const layout = buildCanvasLayout(groups, entries, colorFor)
+  const layoutRef = useRef(layout)
+  layoutRef.current = layout
+  const transformRef = useRef(transform)
+  transformRef.current = transform
+
+  function contentPointFromClient(clientX: number, clientY: number) {
+    const rect = viewportRef.current?.getBoundingClientRect()
+    if (!rect) return { x: 0, y: 0 }
+    const t = transformRef.current
+    return {
+      x: (clientX - rect.left - t.x) / t.scale,
+      y: (clientY - rect.top - t.y) / t.scale,
+    }
+  }
+
+  function groupAtPoint(x: number, y: number): SimulationGroup | null {
+    for (const laidOutGroup of layoutRef.current.groups) {
+      const dx = x - laidOutGroup.centerX
+      const dy = y - laidOutGroup.centerY
+      if (dx * dx + dy * dy <= laidOutGroup.clusterRadius * laidOutGroup.clusterRadius) {
+        return laidOutGroup.group
+      }
+    }
+    return null
+  }
+
+  useEffect(() => {
+    if (!draggingId) return
+
+    function handleMove(event: MouseEvent) {
+      setDragPoint({ x: event.clientX, y: event.clientY })
+      const state = nodeDragState.current
+      if (!state) return
+      if (!state.moved && Math.hypot(event.clientX - state.startClientX, event.clientY - state.startClientY) > DRAG_THRESHOLD_PX) {
+        state.moved = true
+      }
+      const point = contentPointFromClient(event.clientX, event.clientY)
+      const group = groupAtPoint(point.x, point.y)
+      setDropTargetId(group && isCompatibleGroup(state.entry, group) ? group.id : null)
+    }
+
+    function handleUp(event: MouseEvent) {
+      const state = nodeDragState.current
+      if (state) {
+        const point = contentPointFromClient(event.clientX, event.clientY)
+        const group = groupAtPoint(point.x, point.y)
+        if (group && isCompatibleGroup(state.entry, group)) {
+          onNodeMoved(state.entry, group)
+        } else if (!state.moved) {
+          onNodeClick(state.entry)
+        }
+      }
+      nodeDragState.current = null
+      setDraggingId(null)
+      setDropTargetId(null)
+      setDragPoint(null)
+    }
+
+    window.addEventListener('mousemove', handleMove)
+    window.addEventListener('mouseup', handleUp)
+    return () => {
+      window.removeEventListener('mousemove', handleMove)
+      window.removeEventListener('mouseup', handleUp)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [draggingId])
 
   function handleWheel(event: ReactWheelEvent) {
     event.preventDefault()
@@ -53,35 +128,22 @@ export default function SimulationCanvas({
     panState.current = null
   }
 
-  function handleNodeDragStart(entry: SimulationEntry) {
-    draggedEntry.current = entry
+  function handleNodeMouseDown(entry: SimulationEntry, event: ReactMouseEvent) {
+    event.stopPropagation()
+    if (event.button !== 0) return
+    nodeDragState.current = { entry, startClientX: event.clientX, startClientY: event.clientY, moved: false }
     setDraggingId(entry.id)
+    setDragPoint({ x: event.clientX, y: event.clientY })
   }
 
-  function handleNodeDragEnd() {
-    draggedEntry.current = null
-    setDraggingId(null)
-    setDropTargetId(null)
-  }
-
-  function handleGroupDragOver(group: SimulationGroup, event: ReactMouseEvent) {
-    event.preventDefault()
-    if (draggedEntry.current && isCompatibleGroup(draggedEntry.current, group)) {
-      setDropTargetId(group.id)
-    }
-  }
-
-  function handleGroupDrop(group: SimulationGroup, event: ReactMouseEvent) {
-    event.preventDefault()
-    setDropTargetId(null)
-    const entry = draggedEntry.current
-    if (entry && isCompatibleGroup(entry, group)) {
-      onNodeMoved(entry, group)
-    }
-  }
+  const draggingNode = layout.groups.flatMap((g) => g.nodes).find((node) => node.entry.id === draggingId)
+  const viewportRect = viewportRef.current?.getBoundingClientRect()
+  const ghostPoint =
+    dragPoint && viewportRect ? { x: dragPoint.x - viewportRect.left, y: dragPoint.y - viewportRect.top } : null
 
   return (
     <div
+      ref={viewportRef}
       className="sim-canvas-viewport"
       onWheel={handleWheel}
       onMouseDown={handleMouseDown}
@@ -115,9 +177,6 @@ export default function SimulationCanvas({
               width: laidOutGroup.clusterRadius * 2,
               height: laidOutGroup.clusterRadius * 2,
             }}
-            onDragOver={(event) => handleGroupDragOver(laidOutGroup.group, event)}
-            onDragLeave={() => setDropTargetId((current) => (current === laidOutGroup.group.id ? null : current))}
-            onDrop={(event) => handleGroupDrop(laidOutGroup.group, event)}
           />
         ))}
 
@@ -141,10 +200,7 @@ export default function SimulationCanvas({
             <div
               key={node.entry.id}
               className="sim-node"
-              draggable
-              onDragStart={() => handleNodeDragStart(node.entry)}
-              onDragEnd={handleNodeDragEnd}
-              onClick={() => onNodeClick(node.entry)}
+              onMouseDown={(event) => handleNodeMouseDown(node.entry, event)}
               style={{
                 left: node.x - node.diameter / 2,
                 top: node.y - node.diameter / 2,
@@ -159,6 +215,21 @@ export default function SimulationCanvas({
           )),
         )}
       </div>
+
+      {draggingNode && ghostPoint && (
+        <div
+          className="sim-node sim-node-ghost"
+          style={{
+            left: ghostPoint.x - draggingNode.diameter / 2,
+            top: ghostPoint.y - draggingNode.diameter / 2,
+            width: draggingNode.diameter,
+            height: draggingNode.diameter,
+            background: layout.groups.find((g) => g.nodes.includes(draggingNode))?.color,
+          }}
+        >
+          <span style={{ fontSize: draggingNode.twoLines ? CANVAS_NODE_TEXT_SIZE_TWO_LINES : 11 }}>{draggingNode.entry.title}</span>
+        </div>
+      )}
     </div>
   )
 }

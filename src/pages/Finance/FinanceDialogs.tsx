@@ -102,26 +102,28 @@ function CardFields({ form, onChange }: { form: CardForm; onChange: (form: CardF
 
   return (
     <>
-      <label>
-        Bandeira
-        <select value={form.brand} onChange={(event) => set('brand', event.target.value)}>
-          {BRANDS.map((brand) => (
-            <option key={brand} value={brand}>
-              {brand}
-            </option>
-          ))}
-        </select>
-      </label>
+      <div className="finance-form-row">
+        <label>
+          Bandeira
+          <select value={form.brand} onChange={(event) => set('brand', event.target.value)}>
+            {BRANDS.map((brand) => (
+              <option key={brand} value={brand}>
+                {brand}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          Limite
+          <input type="text" inputMode="decimal" value={form.limit} onChange={(event) => set('limit', event.target.value)} />
+        </label>
+      </div>
       {form.brand === OTHER && (
         <label>
           Digite a bandeira do cartão
           <input type="text" value={form.otherBrand} onChange={(event) => set('otherBrand', event.target.value)} />
         </label>
       )}
-      <label>
-        Limite
-        <input type="text" inputMode="decimal" value={form.limit} onChange={(event) => set('limit', event.target.value)} />
-      </label>
       <div className="finance-form-row">
         <label>
           Dia fechamento (1-31)
@@ -137,21 +139,23 @@ function CardFields({ form, onChange }: { form: CardForm; onChange: (form: CardF
           <input type="text" inputMode="numeric" value={form.dueDay} onChange={(event) => set('dueDay', event.target.value)} />
         </label>
       </div>
-      <label className="auth-form-checkbox">
-        <input type="checkbox" checked={form.hasInterest} onChange={(event) => set('hasInterest', event.target.checked)} />
-        Cobra juros no parcelamento?
-      </label>
-      {form.hasInterest && (
-        <label>
-          Taxa de juros mensal (%) — ex: 2,5
-          <input
-            type="text"
-            inputMode="decimal"
-            value={form.interestRate}
-            onChange={(event) => set('interestRate', event.target.value)}
-          />
+      <div className={form.hasInterest ? 'finance-form-row finance-interest-row' : undefined}>
+        <label className="auth-form-checkbox">
+          <input type="checkbox" checked={form.hasInterest} onChange={(event) => set('hasInterest', event.target.checked)} />
+          Cobra juros no parcelamento?
         </label>
-      )}
+        {form.hasInterest && (
+          <label>
+            Taxa mensal (%) — ex: 2,5
+            <input
+              type="text"
+              inputMode="decimal"
+              value={form.interestRate}
+              onChange={(event) => set('interestRate', event.target.value)}
+            />
+          </label>
+        )}
+      </div>
     </>
   )
 }

@@ -64,6 +64,22 @@ export type StatementTransaction = {
   credit: boolean
 }
 
+export type ShoppingList = {
+  id: string
+  title: string
+  createdAt: number
+}
+
+export type ShoppingListItem = {
+  id: string
+  listId: string
+  name: string
+  quantity: number | null
+  price: number | null
+  done: boolean
+  createdAt: number
+}
+
 function userCollection(uid: string, name: string) {
   return collection(db, FirestoreCollections.USERS, uid, name)
 }
@@ -167,4 +183,34 @@ export async function loadTransactions(uid: string, bankId: string): Promise<Sta
       credit: data.credit ?? false,
     }
   })
+}
+
+export async function loadLists(uid: string): Promise<ShoppingList[]> {
+  const snapshot = await getDocs(userCollection(uid, FirestoreCollections.LISTS))
+  return snapshot.docs
+    .map((doc) => {
+      const data = doc.data()
+      return { id: doc.id, title: data.title ?? '', createdAt: data.createdAt ?? 0 }
+    })
+    .sort((a, b) => b.createdAt - a.createdAt)
+}
+
+export async function loadListItems(uid: string, listId: string): Promise<ShoppingListItem[]> {
+  const snapshot = await getDocs(
+    query(userCollection(uid, FirestoreCollections.LIST_ITEMS), where('listId', '==', listId)),
+  )
+  return snapshot.docs
+    .map((doc) => {
+      const data = doc.data()
+      return {
+        id: doc.id,
+        listId: data.listId ?? '',
+        name: data.name ?? '',
+        quantity: data.quantity ?? null,
+        price: data.price ?? null,
+        done: data.done ?? false,
+        createdAt: data.createdAt ?? 0,
+      }
+    })
+    .sort((a, b) => a.createdAt - b.createdAt)
 }

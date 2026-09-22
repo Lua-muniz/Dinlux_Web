@@ -53,10 +53,18 @@
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  cursor: pointer;
+  cursor: grab;
   padding: 0 12px;
   text-align: center;
   user-select: none;
+}
+
+.sim-node-ghost {
+  z-index: 30;
+  pointer-events: none;
+  cursor: grabbing;
+  opacity: 0.9;
+  box-shadow: var(--shadow-card);
 }
 
 .sim-node span {

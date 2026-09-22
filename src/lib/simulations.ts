@@ -125,9 +125,15 @@ export async function loadGroups(uid: string, simulationId: string): Promise<Sim
     .sort((a, b) => a.order - b.order)
 }
 
-export type NewEntry = Omit<SimulationEntry, 'id' | 'groupId' | 'createdAt' | 'confirmedPeriods' | 'ultimoPeriodoVisto' | 'avisosArquivado'>
+export type NewEntry = Omit<SimulationEntry, 'id' | 'groupId' | 'createdAt' | 'confirmedPeriods' | 'ultimoPeriodoVisto' | 'avisosArquivado'> & {
+  createdAt?: number
+}
 
 export async function createEntry(uid: string, entry: NewEntry) {
+  if (!uid) throw new Error('Usuário não autenticado.')
+  if (!entry.simulationId) throw new Error('Simulação inválida para este lançamento.')
+  if (!entry.bankId) throw new Error('Selecione um banco antes de salvar.')
+
   const existing = await getDocs(
     query(
       groupsRef(uid),
@@ -137,12 +143,12 @@ export async function createEntry(uid: string, entry: NewEntry) {
       where('entryType', '==', entry.type),
     ),
   )
-  const groups = existing.docs.map((item) => ({ id: item.id, ...(item.data() as Omit<SimulationGroup, 'id'>) }))
+  const groups = existing.docs.map((item) => ({ ...(item.data() as Omit<SimulationGroup, 'id'>), id: item.id }))
   const withRoom = groups.filter((group) => group.nodeCount < MAX_NODES_PER_GROUP).sort((a, b) => a.order - b.order)[0]
 
   const fullEntry = {
     ...entry,
-    createdAt: Date.now(),
+    createdAt: entry.createdAt ?? Date.now(),
     confirmedPeriods: [] as number[],
     ultimoPeriodoVisto: 0,
     avisosArquivado: false,

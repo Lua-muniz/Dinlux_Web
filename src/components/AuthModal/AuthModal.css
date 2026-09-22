@@ -96,11 +96,14 @@
   gap: 6px;
   font-size: 13px;
   opacity: 0.85;
+  min-width: 0;
 }
 
 .auth-form input[type='email'],
 .auth-form input[type='password'],
 .auth-form input[type='text'] {
+  width: 100%;
+  min-width: 0;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: var(--radius-sm);

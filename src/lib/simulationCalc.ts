@@ -26,15 +26,20 @@ export function unpaidInstallmentsValue(installmentValue: number, total: number,
   return installmentValue * unpaidInstallments(total, paid)
 }
 
+// Parte do valor principal da compra (sem juros) ainda em aberto: o juros é pago pelo
+// usuário mês a mês, mas não consome limite do cartão, só o valor da compra em si consome
+function unpaidPrincipal(entry: SimulationEntry): number {
+  if (entry.installments <= 0) return 0
+  const installmentWithoutInterest = entry.totalValue / entry.installments
+  return installmentWithoutInterest * unpaidInstallments(entry.installments, entry.paidInstallments)
+}
+
 export function availableCardLimit(
   totalLimit: number,
   creditPurchases: SimulationEntry[],
   usedAmount: number,
 ): number {
-  const used = creditPurchases.reduce(
-    (sum, entry) => sum + unpaidInstallmentsValue(entry.installmentValue, entry.installments, entry.paidInstallments),
-    0,
-  )
+  const used = creditPurchases.reduce((sum, entry) => sum + unpaidPrincipal(entry), 0)
   return totalLimit - used - usedAmount
 }
 

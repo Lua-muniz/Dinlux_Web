@@ -47,6 +47,15 @@
   opacity: 0.55;
 }
 
+.sim-tabs-divider {
+  flex-shrink: 0;
+  align-self: center;
+  width: 1px;
+  height: 24px;
+  margin-inline: 4px;
+  background: rgba(255, 255, 255, 0.18);
+}
+
 .sim-tab.active {
   outline: 2px solid var(--color-cyan);
 }

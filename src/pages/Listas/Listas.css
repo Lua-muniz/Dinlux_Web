@@ -1,0 +1,149 @@
+.listas {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  width: 100%;
+  height: 100%;
+}
+
+.listas-sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: calc(100vh - 160px);
+}
+
+.listas-sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.listas-new-btn {
+  padding: 6px 16px;
+  font-size: 13px;
+}
+
+.listas-list-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-y: auto;
+}
+
+.listas-list-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.listas-list-row:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.listas-list-row.active {
+  background: rgba(2, 230, 254, 0.14);
+}
+
+.listas-list-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+}
+
+.listas-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.listas-add-button {
+  background: var(--color-cyan);
+  color: var(--color-black);
+}
+
+.listas-add-button:hover {
+  filter: brightness(1.08);
+}
+
+.listas-main-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.listas-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  font-size: 14px;
+}
+
+.listas-summary-item {
+  opacity: 0.85;
+}
+
+.listas-items {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-y: auto;
+}
+
+.listas-item-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 8px;
+  border-radius: var(--radius-sm);
+}
+
+.listas-item-row:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.listas-item-row.done {
+  opacity: 0.55;
+}
+
+.listas-item-row.done .listas-item-name {
+  text-decoration: line-through;
+}
+
+.listas-item-row input[type='checkbox'] {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  accent-color: var(--color-cyan);
+}
+
+.listas-item-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.listas-item-name {
+  font-size: 15px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.listas-item-details {
+  font-size: 12px;
+  opacity: 0.65;
+}

@@ -62,6 +62,7 @@ export function CreateEntryDialog({
   const card = bank?.cards.find((item) => item.id === cardId)
   const [value, setValue] = useState('')
   const [installments, setInstallments] = useState('1')
+  const [purchaseDate, setPurchaseDate] = useState(() => new Date().toISOString().slice(0, 10))
 
   const [target, setTarget] = useState('')
   const [start, setStart] = useState('')
@@ -84,10 +85,18 @@ export function CreateEntryDialog({
     const rate = method === 'CREDIT' && count > 1 && card?.hasInterest ? card.interestRate : 0
     const perInstallment = installmentValue(totalValue, count, rate)
     const total = totalWithInterest(perInstallment, count)
-    if (count <= 1) return `1x de ${formatCurrency(perInstallment)} (à vista)`
-    if (rate > 0) return `${count}x de ${formatCurrency(perInstallment)} — total com juros: ${formatCurrency(total)}`
-    return `${count}x de ${formatCurrency(perInstallment)} (sem juros)`
-  }, [type, value, installments, method, card])
+    const installmentsText =
+      count <= 1
+        ? `1x de ${formatCurrency(perInstallment)} (à vista)`
+        : rate > 0
+          ? `${count}x de ${formatCurrency(perInstallment)} — total com juros: ${formatCurrency(total)}`
+          : `${count}x de ${formatCurrency(perInstallment)} (sem juros)`
+
+    if (method !== 'CREDIT' || !card || !purchaseDate) return installmentsText
+    const startMonth = purchaseStartMonthIndex(new Date(purchaseDate).getTime(), 'CREDIT', card.closingDay)
+    const endMonth = purchaseEndMonthIndex(startMonth, count)
+    return `${installmentsText} — de ${monthLabel(startMonth)} até ${monthLabel(endMonth)}`
+  }, [type, value, installments, method, card, purchaseDate])
 
   const savingsPreview = useMemo(() => {
     if (type !== 'SAVINGS') return ''
@@ -117,14 +126,16 @@ export function CreateEntryDialog({
         if (!card) return setError('Selecione um cartão')
         const rate = count > 1 && card.hasInterest ? card.interestRate : 0
         const perInstallment = installmentValue(totalValue, count, rate)
-        const total = totalWithInterest(perInstallment, count)
         const cardPurchases = activeCreditPurchases.filter((entry) => entry.bankId === bank.id && entry.cardId === card.id)
         const available = availableCardLimit(card.limit, cardPurchases, card.usedAmount)
-        if (total > available) {
+        // O juros é pago pelo usuário mês a mês, mas não consome limite do cartão: o
+        // que precisa caber no limite disponível é o valor da compra em si
+        if (totalValue > available) {
           return setError(
-            `Essa compra (${formatCurrency(total)} no total) ultrapassa o limite disponível do cartão ${card.label} (${formatCurrency(Math.max(available, 0))}). Reduza o valor ou o número de parcelas, ou escolha outro cartão.`,
+            `Essa compra (${formatCurrency(totalValue)} no total) ultrapassa o limite disponível do cartão ${card.label} (${formatCurrency(Math.max(available, 0))}). Reduza o valor ou o número de parcelas, ou escolha outro cartão.`,
           )
         }
+        if (!purchaseDate) return setError('Escolha a data da compra')
         const entry: NewEntry = {
           simulationId,
           type: 'PURCHASE',
@@ -144,6 +155,7 @@ export function CreateEntryDialog({
           endDate: 0,
           monthlyAmount: 0,
           savedAmount: 0,
+          createdAt: new Date(purchaseDate).getTime(),
         }
         run(() => onSave(entry))
         return
@@ -287,6 +299,15 @@ export function CreateEntryDialog({
                     ? `Este cartão cobra ${card.interestRate}% de juros ao mês (a partir de 2 parcelas).`
                     : 'Este cartão não cobra juros no parcelamento.'}
                 </p>
+                <label>
+                  Data da compra
+                  <input
+                    type="date"
+                    value={purchaseDate}
+                    max={new Date().toISOString().slice(0, 10)}
+                    onChange={(event) => setPurchaseDate(event.target.value)}
+                  />
+                </label>
               </>
             )}
             <label>
