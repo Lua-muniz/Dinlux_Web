@@ -16,7 +16,7 @@ import graficosProgressoImg from '../../assets/features/graficos-progresso.png'
 import graficosCartoesImg from '../../assets/features/graficos-cartoes.png'
 import './Landing.css'
 
-const APK_DOWNLOAD_URL = '/downloads/dinlux.apk'
+const APK_DOWNLOAD_URL = 'https://github.com/Lua-muniz/Dinlux_App/releases/download/v1.0.0/dinlux.apk'
 
 type FeatureImage = { src: string; className?: string }
 

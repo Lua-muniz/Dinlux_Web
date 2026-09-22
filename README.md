@@ -143,7 +143,19 @@ forma descrita na seção do Windows.
 
 ## Observação sobre o download do aplicativo Android
 
-O botão "Baixar para Android" da página inicial aponta para `public/downloads/dinlux.apk`. Esse
-arquivo precisa existir nessa pasta para o botão funcionar; ele corresponde ao `.apk` gerado a
-partir do projeto do aplicativo Android (pasta `app/release/dinlux.apk` depois de um build de
-release no Android Studio, ou via `./gradlew assembleRelease` na raiz daquele projeto).
+O botão "Baixar para Android" da página inicial aponta para um Release do GitHub no repositório
+do aplicativo Android (`APK_DOWNLOAD_URL`, em `src/pages/Landing/Landing.tsx`), não para um
+arquivo dentro deste repositório. O Firebase Hosting, no plano gratuito (Spark), não permite
+publicar arquivos executáveis (incluindo `.apk`) — por isso o arquivo é distribuído fora do
+Hosting, como anexo de um Release em `https://github.com/Lua-muniz/Dinlux_App/releases`.
+
+Para atualizar o `.apk` disponibilizado no site, depois de gerar um novo build de release do
+aplicativo Android (pasta `app/release/dinlux.apk`, ou via `./gradlew assembleRelease` na raiz
+daquele projeto):
+
+1. Crie um novo Release em `https://github.com/Lua-muniz/Dinlux_App/releases/new`, com uma nova
+   tag de versão, anexando o `.apk` na área "Attach binaries" (não na caixa de descrição, que só
+   aceita imagens/documentos).
+2. Copie a URL de download do arquivo anexado e atualize a constante `APK_DOWNLOAD_URL` em
+   `src/pages/Landing/Landing.tsx`.
+3. Gere um novo build (`npm run build`) e publique (`firebase deploy`).
