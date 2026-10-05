@@ -114,6 +114,30 @@ export function DonutChart({ used, available }: { used: number; available: numbe
   )
 }
 
+export function GaugeChart({ percent, color }: { percent: number; color: string }) {
+  const width = 200
+  const stroke = 22
+  const radius = (width - stroke) / 2
+  const center = width / 2
+  const clamped = Math.min(Math.max(percent, 0), 100)
+  const height = center + stroke / 2
+  const point = (fraction: number) => {
+    const angle = Math.PI * (1 - fraction)
+    return `${center + radius * Math.cos(angle)} ${center - radius * Math.sin(angle)}`
+  }
+  const path = (fraction: number) => `M ${point(0)} A ${radius} ${radius} 0 0 1 ${point(fraction)}`
+
+  return (
+    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Uso do limite do cartão">
+      <path d={path(0.9999)} fill="none" stroke="var(--color-track-bg)" strokeWidth={stroke} />
+      {clamped > 0 && <path d={path(Math.min(clamped / 100, 0.9999))} fill="none" stroke={color} strokeWidth={stroke} />}
+      <text x={center} y={center - 4} textAnchor="middle" fill="var(--color-white)" fontSize="22" fontWeight="700">
+        {Math.round(clamped)}%
+      </text>
+    </svg>
+  )
+}
+
 function useElementWidth<T extends HTMLElement>() {
   const ref = useRef<T>(null)
   const [width, setWidth] = useState(0)

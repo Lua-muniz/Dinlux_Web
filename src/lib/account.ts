@@ -57,6 +57,7 @@ const USER_SUBCOLLECTIONS = [
   FirestoreCollections.SIMULATION_ENTRIES,
   FirestoreCollections.SIMULATION_GROUPS,
   FirestoreCollections.STATEMENT_TRANSACTIONS,
+  FirestoreCollections.INVOICE_TRANSACTIONS,
   FirestoreCollections.LISTS,
   FirestoreCollections.LIST_ITEMS,
 ]

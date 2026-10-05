@@ -21,7 +21,7 @@ O backend é o mesmo do aplicativo Android: **Firebase Authentication** para log
 - `src/pages/Finance`: cadastro de bancos e cartões.
 - `src/pages/Simulations`: simulações de compras e economias.
 - `src/pages/Listas`: listas de tarefas/compras.
-- `src/pages/ImportExtrato`: importação de extrato bancário.
+- `src/pages/Importar`: importação de extrato bancário e de fatura de cartão (OFX/CSV).
 - `src/pages/Avisos`: módulo de avisos (mestre/detalhe: lista de bancos + chat de mensagens).
 - `src/pages/Tutorial`: tutorial em slides.
 - `src/lib`: funções de acesso ao Firebase/Firestore, compartilhadas entre as páginas.

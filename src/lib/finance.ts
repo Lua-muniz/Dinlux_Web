@@ -2,7 +2,7 @@ import { addDoc, collection, deleteDoc, doc, getDocs, query, updateDoc, where, w
 import type { DocumentReference } from 'firebase/firestore'
 import { db } from './firebase'
 import { FirestoreCollections } from './firestoreCollections'
-import type { Card } from './dinluxData'
+import type { Bank, Card } from './dinluxData'
 
 const BATCH_LIMIT = 400
 
@@ -80,13 +80,34 @@ export async function deleteStatement(uid: string, bankId: string) {
   await deleteAll(snapshot.docs.map((item) => item.ref))
 }
 
+export async function deleteInvoice(uid: string, cardId: string) {
+  const snapshot = await getDocs(
+    query(userCollection(uid, FirestoreCollections.INVOICE_TRANSACTIONS), where('cardId', '==', cardId)),
+  )
+  await deleteAll(snapshot.docs.map((item) => item.ref))
+}
+
+async function deleteBankInvoices(uid: string, bankId: string) {
+  const snapshot = await getDocs(
+    query(userCollection(uid, FirestoreCollections.INVOICE_TRANSACTIONS), where('bankId', '==', bankId)),
+  )
+  await deleteAll(snapshot.docs.map((item) => item.ref))
+}
+
 export async function deleteBank(uid: string, bankId: string) {
   await deleteEntriesAndGroups(uid, bankId)
   await deleteStatement(uid, bankId)
+  await deleteBankInvoices(uid, bankId)
   await deleteDoc(bankRef(uid, bankId))
 }
 
 export async function deleteCard(uid: string, bankId: string, cardId: string, remaining: Card[]) {
   await deleteEntriesAndGroups(uid, bankId, cardId)
+  await deleteInvoice(uid, cardId)
   await saveCards(uid, bankId, remaining)
+}
+
+export async function setCardLimit(uid: string, bank: Bank, card: Card, limit: number) {
+  const updated = bank.cards.map((existing) => (existing.id === card.id ? { ...existing, limit } : existing))
+  await saveCards(uid, bank.id, updated)
 }

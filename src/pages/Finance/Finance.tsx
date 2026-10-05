@@ -5,9 +5,11 @@ import { formatCurrency } from '../../components/Charts/Charts'
 import {
   loadActiveEntries,
   loadBanks,
+  loadInvoiceTransactions,
   loadTransactions,
   type Bank,
   type Card,
+  type InvoiceTransactionRecord,
   type SimulationEntry,
   type StatementTransaction,
 } from '../../lib/dinluxData'
@@ -16,6 +18,7 @@ import {
   createBank,
   deleteBank,
   deleteCard,
+  deleteInvoice,
   deleteStatement,
   renameBank,
   saveCards,
@@ -33,6 +36,7 @@ type Dialog =
   | 'newCard'
   | 'editCard'
   | 'available'
+  | 'deleteInvoice'
   | 'deleteCard'
 
 const DOTS = 'M5 12h.01M12 12h.01M19 12h.01'
@@ -75,6 +79,33 @@ function cyclic(index: number, direction: number, size: number): number {
   return (index + direction + size) % size
 }
 
+function StatementTable({ rows }: { rows: { id: string; date: number; description: string; amount: number; credit: boolean }[] }) {
+  return (
+    <div className="finance-table-wrap">
+      <table className="finance-table">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Valor</th>
+            <th>Descrição</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr key={row.id}>
+              <td>{new Date(row.date).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}</td>
+              <td className={row.credit ? 'income' : 'expense'}>
+                {row.credit ? '+' : '-'} {formatCurrency(Math.abs(row.amount))}
+              </td>
+              <td>{row.description}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
 export default function Finance() {
   const { user } = useAuth()
   const uid = user?.uid
@@ -84,6 +115,7 @@ export default function Finance() {
   const [bankIndex, setBankIndex] = useState(0)
   const [cardIndex, setCardIndex] = useState(0)
   const [transactions, setTransactions] = useState<StatementTransaction[] | null>(null)
+  const [invoice, setInvoice] = useState<InvoiceTransactionRecord[] | null>(null)
   const [dialog, setDialog] = useState<Dialog | null>(null)
 
   const reload = useCallback(async () => {
@@ -126,6 +158,24 @@ export default function Finance() {
     }
   }, [uid, bankId])
 
+  const cardId = card?.id
+
+  useEffect(() => {
+    if (!uid || !cardId) return
+    let cancelled = false
+    setInvoice(null)
+    loadInvoiceTransactions(uid, cardId)
+      .then((loaded) => {
+        if (!cancelled) setInvoice(loaded.sort((a, b) => b.date - a.date))
+      })
+      .catch(() => {
+        if (!cancelled) setInvoice([])
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [uid, cardId])
+
   if (status === 'loading') return <p className="home-status">Carregando…</p>
   if (status === 'error') return <p className="home-status">Não foi possível carregar os dados.</p>
   if (!uid) return null
@@ -156,6 +206,7 @@ export default function Finance() {
         { label: 'Editar', onSelect: () => setDialog('editCard') },
         { label: 'Criar', onSelect: () => setDialog('newCard') },
         { label: 'Limite Disponível', onSelect: () => setDialog('available') },
+        { label: 'Excluir Fatura', onSelect: () => setDialog('deleteInvoice') },
         { label: 'Excluir', danger: true, onSelect: () => setDialog('deleteCard') },
       ]
     : [{ label: 'Criar', onSelect: () => setDialog('newCard') }]
@@ -219,39 +270,37 @@ export default function Finance() {
       </div>
 
       {bank && (
-        <section className="home-card finance-statement">
-          <div className="home-card-title">
-            <strong>Extrato</strong>
-          </div>
-          {transactions === null ? (
-            <p className="finance-empty-text">Carregando extrato…</p>
-          ) : transactions.length === 0 ? (
-            <p className="finance-empty-text">Nenhum lançamento importado ainda.</p>
-          ) : (
-            <div className="finance-table-wrap">
-              <table className="finance-table">
-                <thead>
-                  <tr>
-                    <th>Data</th>
-                    <th>Valor</th>
-                    <th>Descrição</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {transactions.map((transaction) => (
-                    <tr key={transaction.id}>
-                      <td>{new Date(transaction.date).toLocaleDateString('pt-BR')}</td>
-                      <td className={transaction.credit ? 'income' : 'expense'}>
-                        {transaction.credit ? '+' : '-'} {formatCurrency(Math.abs(transaction.amount))}
-                      </td>
-                      <td>{transaction.description}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+        <div className="finance-history">
+          <section className="home-card finance-statement">
+            <div className="home-card-title">
+              <strong>Extrato</strong>
+              <span>{bank.name}</span>
             </div>
-          )}
-        </section>
+            {transactions === null ? (
+              <p className="finance-empty-text">Carregando extrato…</p>
+            ) : transactions.length === 0 ? (
+              <p className="finance-empty-text">Nenhum lançamento importado ainda.</p>
+            ) : (
+              <StatementTable rows={transactions} />
+            )}
+          </section>
+
+          <section className="home-card finance-statement">
+            <div className="home-card-title">
+              <strong>Fatura</strong>
+              {card && <span>{card.label}</span>}
+            </div>
+            {!card ? (
+              <p className="finance-empty-text">Esse banco não tem cartão de crédito cadastrado.</p>
+            ) : invoice === null ? (
+              <p className="finance-empty-text">Carregando fatura…</p>
+            ) : invoice.length === 0 ? (
+              <p className="finance-empty-text">Nenhuma fatura importada para esse cartão ainda.</p>
+            ) : (
+              <StatementTable rows={invoice} />
+            )}
+          </section>
+        </div>
       )}
 
       {dialog === 'newBank' && (
@@ -306,7 +355,7 @@ export default function Finance() {
       {bank && dialog === 'deleteBank' && (
         <ConfirmDialog
           title="Excluir banco"
-          message={`Tem certeza que deseja excluir "${bank.name}"? Essa ação não pode ser desfeita e apaga junto tudo relacionado a esse banco: lançamentos e Grupos em Simulações, e o extrato importado dele.`}
+          message={`Tem certeza que deseja excluir "${bank.name}"? Essa ação não pode ser desfeita e apaga junto tudo relacionado a esse banco: lançamentos e Grupos em Simulações, o extrato e as faturas importados dele.`}
           confirmLabel="Excluir"
           onClose={closeDialog}
           onConfirm={async () => {
@@ -362,10 +411,23 @@ export default function Finance() {
         />
       )}
 
+      {bank && card && dialog === 'deleteInvoice' && (
+        <ConfirmDialog
+          title="Excluir fatura"
+          message={`Tem certeza que deseja excluir toda a fatura importada de "${card.label}"? Essa ação não pode ser desfeita. O cartão e as simulações continuam intactos, só a fatura importada é apagada.`}
+          confirmLabel="Excluir"
+          onClose={closeDialog}
+          onConfirm={async () => {
+            await deleteInvoice(uid, card.id)
+            setInvoice([])
+          }}
+        />
+      )}
+
       {bank && card && dialog === 'deleteCard' && (
         <ConfirmDialog
           title="Excluir cartão"
-          message="Tem certeza que deseja excluir este cartão? Essa ação não pode ser desfeita e apaga junto tudo relacionado a ele: os lançamentos e Grupos em Simulações que usam esse cartão."
+          message="Tem certeza que deseja excluir este cartão? Essa ação não pode ser desfeita e apaga junto tudo relacionado a ele: os lançamentos e Grupos em Simulações que usam esse cartão e a fatura importada dele."
           confirmLabel="Excluir"
           onClose={closeDialog}
           onConfirm={async () => {

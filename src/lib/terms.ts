@@ -10,7 +10,7 @@ export const TERMS_BLOCKS: TermsBlock[] = [
   },
   {
     "kind": "text",
-    "text": "Versão 1.0, última atualização: 30/08/2026"
+    "text": "Versão 1.0, última atualização: 02/10/2026"
   },
   {
     "kind": "text",
@@ -46,7 +46,7 @@ export const TERMS_BLOCKS: TermsBlock[] = [
   },
   {
     "kind": "text",
-    "text": "O Dinlux não se conecta ao seu banco de verdade, não usa Open Banking, não pede usuário e senha do seu banco e não tem acesso a nenhuma informação bancária real automaticamente. TUDO que o app sabe sobre suas finanças é o que você mesmo digita ou importa manualmente: o saldo declarado de cada banco cadastrado e o limite, o dia de fechamento, o dia de vencimento e a taxa de juros de cada cartão cadastrado; as simulações de compras parceladas e metas de economia que você cria dentro do app; e os extratos bancários (arquivos OFX ou CSV) que você exporta do site ou do app do seu banco e importa manualmente no Dinlux."
+    "text": "O Dinlux não se conecta ao seu banco de verdade, não usa Open Banking, não pede usuário e senha do seu banco e não tem acesso a nenhuma informação bancária real automaticamente. TUDO que o app sabe sobre suas finanças é o que você mesmo digita ou importa manualmente: o saldo declarado de cada banco cadastrado e o limite, o dia de fechamento, o dia de vencimento e a taxa de juros de cada cartão cadastrado; as simulações de compras parceladas e metas de economia que você cria dentro do app; e os extratos bancários e as faturas de cartão de crédito (arquivos OFX ou CSV) que você exporta do site ou do app do seu banco e importa manualmente no Dinlux."
   },
   {
     "kind": "text",
@@ -55,6 +55,10 @@ export const TERMS_BLOCKS: TermsBlock[] = [
   {
     "kind": "text",
     "text": "Finalidade do extrato bancário importado: usado APENAS para alimentar as tabelas e os gráficos de \"Movimentações\" dentro do app, pra você ter uma visão organizada do que entrou e saiu da sua conta no período importado. O extrato importado não altera seu saldo automaticamente, não é usado em nenhum cálculo de simulação, e não é compartilhado com ninguém, serve só de consulta e visualização pra você mesmo."
+  },
+  {
+    "kind": "text",
+    "text": "Finalidade da fatura de cartão importada: usada APENAS para exibir, em Finanças, os lançamentos da fatura de cada cartão e, na aba \"Faturas\" do dashboard, quanto de cada cartão está em uso em relação ao limite. Se, ao importar, você informar o limite disponível, ele atualiza o limite do cartão cadastrado. A fatura importada não é compartilhada com ninguém."
   },
   {
     "kind": "sub",
@@ -70,7 +74,7 @@ export const TERMS_BLOCKS: TermsBlock[] = [
   },
   {
     "kind": "text",
-    "text": "O app não pede CPF, não usa login social (Google ou Facebook), não acessa sua localização, não acessa contatos, câmera, arquivos do celular fora do arquivo de extrato que você escolhe importar, e não usa nenhuma ferramenta de rastreamento, analytics ou publicidade de terceiros. Isso pode ser conferido diretamente no código fonte do app: não há nenhuma permissão sensível declarada, nem dependência de bibliotecas de anúncio, analytics ou rastreamento."
+    "text": "O app não pede CPF, não usa login social (Google ou Facebook), não acessa sua localização, não acessa contatos, câmera, arquivos do celular fora do arquivo de extrato ou fatura que você escolhe importar, e não usa nenhuma ferramenta de rastreamento, analytics ou publicidade de terceiros. Isso pode ser conferido diretamente no código fonte do app: não há nenhuma permissão sensível declarada, nem dependência de bibliotecas de anúncio, analytics ou rastreamento."
   },
   {
     "kind": "heading",
@@ -86,7 +90,7 @@ export const TERMS_BLOCKS: TermsBlock[] = [
   },
   {
     "kind": "text",
-    "text": "Todos os seus dados são armazenados na infraestrutura do Firebase (Google Cloud): Firebase Authentication para os dados de login, e Cloud Firestore (banco de dados) para todo o restante (perfil, bancos, cartões, simulações, extratos importados, listas e o próprio registro deste aceite). O Firebase/Google Cloud é o ÚNICO terceiro que processa seus dados, atuando como operador dos dados (na definição da LGPD), seguindo as instruções técnicas do Dinlux, e sujeito aos próprios padrões de segurança e certificações internacionais do Google Cloud."
+    "text": "Todos os seus dados são armazenados na infraestrutura do Firebase (Google Cloud): Firebase Authentication para os dados de login, e Cloud Firestore (banco de dados) para todo o restante (perfil, bancos, cartões, simulações, extratos e faturas importados, listas e o próprio registro deste aceite). O Firebase/Google Cloud é o ÚNICO terceiro que processa seus dados, atuando como operador dos dados (na definição da LGPD), seguindo as instruções técnicas do Dinlux, e sujeito aos próprios padrões de segurança e certificações internacionais do Google Cloud."
   },
   {
     "kind": "text",
@@ -106,7 +110,7 @@ export const TERMS_BLOCKS: TermsBlock[] = [
   },
   {
     "kind": "text",
-    "text": "Você tem direito a, a qualquer momento: confirmar a existência de tratamento e ACESSAR seus dados, já que tudo que o Dinlux guarda sobre você fica visível dentro das próprias telas do app (Finanças, Simulações, Avisos, Listas, Extratos); CORRIGIR dados incompletos, inexatos ou desatualizados, já que nome, e-mail e senha são editáveis pelo painel de perfil, e os dados financeiros são editáveis nas telas normais de cada módulo; ELIMINAR seus dados através da opção \"Excluir Conta\" no painel lateral (essa ação é permanente, não pode ser desfeita, e apaga TUDO: todos os bancos, cartões, simulações, lançamentos, extratos importados, listas, o documento do seu perfil e o registro deste termo aceito; nada fica guardado depois da exclusão, e a conta de login do Firebase Authentication também é excluída, como último passo); PORTABILIDADE dos seus dados a outro fornecedor, quando aplicável; saber com quem seus dados são compartilhados (resposta: só com o Firebase/Google Cloud, como infraestrutura de armazenamento, ver seção 4); e REVOGAR o consentimento a qualquer momento, o que na prática significa excluir a conta, já que essa é a finalidade central do app."
+    "text": "Você tem direito a, a qualquer momento: confirmar a existência de tratamento e ACESSAR seus dados, já que tudo que o Dinlux guarda sobre você fica visível dentro das próprias telas do app (Finanças, Simulações, Avisos, Listas, Extratos, Faturas); CORRIGIR dados incompletos, inexatos ou desatualizados, já que nome, e-mail e senha são editáveis pelo painel de perfil, e os dados financeiros são editáveis nas telas normais de cada módulo; ELIMINAR seus dados através da opção \"Excluir Conta\" no painel lateral (essa ação é permanente, não pode ser desfeita, e apaga TUDO: todos os bancos, cartões, simulações, lançamentos, extratos e faturas importados, listas, o documento do seu perfil e o registro deste termo aceito; nada fica guardado depois da exclusão, e a conta de login do Firebase Authentication também é excluída, como último passo); PORTABILIDADE dos seus dados a outro fornecedor, quando aplicável; saber com quem seus dados são compartilhados (resposta: só com o Firebase/Google Cloud, como infraestrutura de armazenamento, ver seção 4); e REVOGAR o consentimento a qualquer momento, o que na prática significa excluir a conta, já que essa é a finalidade central do app."
   },
   {
     "kind": "heading",
@@ -138,6 +142,6 @@ export const TERMS_BLOCKS: TermsBlock[] = [
   },
   {
     "kind": "text",
-    "text": "Seus dados financeiros (saldo, cartões, extratos) são só seus, ficam guardados de forma protegida no Firebase/Google Cloud, nunca são vendidos ou compartilhados com anunciantes, e servem só para o próprio app calcular suas simulações e mostrar seus gráficos. Você pode ver, corrigir ou apagar tudo a qualquer momento, e apagar sua conta apaga literalmente tudo, sem deixar rastro, inclusive este aceite."
+    "text": "Seus dados financeiros (saldo, cartões, extratos, faturas) são só seus, ficam guardados de forma protegida no Firebase/Google Cloud, nunca são vendidos ou compartilhados com anunciantes, e servem só para o próprio app calcular suas simulações e mostrar seus gráficos. Você pode ver, corrigir ou apagar tudo a qualquer momento, e apagar sua conta apaga literalmente tudo, sem deixar rastro, inclusive este aceite."
   }
 ]

@@ -5,7 +5,7 @@ import Home from './pages/Home/Home'
 import Finance from './pages/Finance/Finance'
 import Simulations from './pages/Simulations/Simulations'
 import Listas from './pages/Listas/Listas'
-import ImportExtrato from './pages/ImportExtrato/ImportExtrato'
+import Importar from './pages/Importar/Importar'
 import Avisos from './pages/Avisos/Avisos'
 import Tutorial from './pages/Tutorial/Tutorial'
 import PanelSection from './pages/Panel/PanelSection'
@@ -30,8 +30,8 @@ export default function App() {
                   <Simulations />
                 ) : section.path === 'listas' ? (
                   <Listas />
-                ) : section.path === 'extrato' ? (
-                  <ImportExtrato />
+                ) : section.path === 'importar' ? (
+                  <Importar />
                 ) : section.path === 'avisos' ? (
                   <Avisos />
                 ) : section.path === 'tutorial' ? (

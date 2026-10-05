@@ -1,0 +1,94 @@
+.option-select {
+  width: 100%;
+}
+
+.option-select-trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 46px;
+  padding: 8px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--color-white);
+  font-size: 15px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.option-select-trigger:focus-visible {
+  outline: 2px solid var(--color-cyan);
+}
+
+.option-select-trigger:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
+.option-select-trigger > svg {
+  margin-left: auto;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.option-select-placeholder {
+  opacity: 0.6;
+}
+
+.option-select-dot {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+.option-select-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.option-select-text > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.option-select-text > small {
+  font-size: 12px;
+  opacity: 0.65;
+}
+
+.option-select-list {
+  position: fixed;
+  z-index: 200;
+  max-height: 280px;
+  margin: 0;
+  padding: 4px;
+  overflow-y: auto;
+  list-style: none;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-sm);
+  background: #2b2b2b;
+  box-shadow: var(--shadow-card);
+}
+
+.option-select-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 6px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.option-select-option.active {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.option-select-option.selected .option-select-text > span {
+  font-weight: 700;
+}

@@ -243,3 +243,44 @@
   background: var(--color-gray);
   color: var(--color-white);
 }
+
+.finance-statement-tabs {
+  display: flex;
+  gap: 4px;
+  align-self: center;
+  margin-bottom: 14px;
+  padding: 4px;
+  border-radius: 30px;
+  background: var(--color-black);
+}
+
+.finance-statement-tabs button {
+  padding: 6px 20px;
+  border: none;
+  border-radius: 30px;
+  background: transparent;
+  color: var(--color-white);
+  font-size: 14px;
+  font-weight: 700;
+  opacity: 0.6;
+  cursor: pointer;
+}
+
+.finance-statement-tabs button.active {
+  opacity: 1;
+  color: var(--color-black);
+  background: var(--color-cyan);
+}
+
+.finance-history {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: 16px;
+  width: 100%;
+  max-width: 1100px;
+  align-items: start;
+}
+
+.finance-history .finance-statement {
+  max-width: none;
+}

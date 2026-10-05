@@ -6,7 +6,6 @@ import Header from '../../components/Header/Header'
 import { useAuth } from '../../context/AuthContext'
 import { clearEmailChangeRequested, wasEmailChangeRequested } from '../../lib/emailChangeNotice'
 import contasCartoesImg from '../../assets/features/contas-cartoes.png'
-import extratosImg from '../../assets/features/extratos.png'
 import simulacoesImg from '../../assets/features/simulacoes.png'
 import listasImg from '../../assets/features/listas.png'
 import avisos1Img from '../../assets/features/avisos-1.png'
@@ -14,9 +13,11 @@ import avisos2Img from '../../assets/features/avisos-2.png'
 import graficosBancosImg from '../../assets/features/graficos-bancos.png'
 import graficosProgressoImg from '../../assets/features/graficos-progresso.png'
 import graficosCartoesImg from '../../assets/features/graficos-cartoes.png'
+import graficosFaturasImg from '../../assets/features/graficos-faturas.png'
+import extratosFaturasImg from '../../assets/features/extratos-faturas.png'
 import './Landing.css'
 
-const APK_DOWNLOAD_URL = 'https://github.com/Lua-muniz/Dinlux_App/releases/download/v1.0.0/dinlux.apk'
+const APK_DOWNLOAD_URL = 'https://github.com/Lua-muniz/Dinlux_App/releases/latest/download/dinlux.apk'
 
 type FeatureImage = { src: string; className?: string }
 
@@ -25,11 +26,6 @@ const FEATURES: { title: string; images: FeatureImage[]; text: string }[] = [
     title: 'Contas e cartões',
     images: [{ src: contasCartoesImg }],
     text: 'Cadastre seus bancos e cartões e acompanhe o saldo de cada um. Para os cartões, veja limite, limite disponível, dia de fechamento e de vencimento, navegando entre eles com as setas.',
-  },
-  {
-    title: 'Extratos',
-    images: [{ src: extratosImg }],
-    text: 'Importe os extratos bancários (OFX ou CSV) e veja todas as movimentações organizadas em uma tabela, com data, valor e descrição de cada lançamento.',
   },
   {
     title: 'Simulações',
@@ -52,8 +48,14 @@ const FEATURES: { title: string; images: FeatureImage[]; text: string }[] = [
       { src: graficosBancosImg },
       { src: graficosProgressoImg, className: 'landing-feature-image-grow' },
       { src: graficosCartoesImg, className: 'landing-feature-image-grow' },
+      { src: graficosFaturasImg },
     ],
-    text: 'Acompanhe o progresso de cada simulação em gráficos de barras e o progresso geral de todas elas em uma linha do tempo. Para os cartões, um gráfico de rosca mostra de forma clara quanto do limite já foi usado e quanto ainda está disponível.',
+    text: 'Acompanhe o progresso de cada simulação em gráficos de barras e o progresso geral de todas elas em uma linha do tempo. A aba Extrato mostra as entradas e saídas de cada banco, Cartões em Simulações mostra quanto do limite de cada cartão está comprometido pelas simulações, e Faturas mostra, em um medidor por cartão, quanto do limite total já foi usado pela fatura importada.',
+  },
+  {
+    title: 'Extratos e faturas',
+    images: [{ src: extratosFaturasImg }],
+    text: 'Importe o extrato do banco e a fatura do cartão em arquivos OFX ou CSV. O extrato mostra as movimentações da conta, com data, valor e descrição de cada lançamento; a fatura mostra tudo o que foi gasto em cada cartão. Em Finanças, as duas tabelas ficam lado a lado: ao trocar de banco, o extrato muda, e ao trocar de cartão, a fatura muda. Ao importar uma fatura, você informa o limite total do cartão, e o sistema avisa se os gastos ultrapassam esse limite, para você manter o cadastro do cartão sempre atualizado.',
   },
 ]
 

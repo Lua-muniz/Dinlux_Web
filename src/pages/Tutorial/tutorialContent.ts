@@ -65,7 +65,7 @@ export const TUTORIAL_TOPICS: TutorialTopic[] = [
         images: [img(2)],
       },
       {
-        text: 'Clique nos três pontinhos ao lado do nome de uma lista para Lançar (debitar de um banco ou cartão o valor dos itens já marcados como feitos), Renomear ou Excluir a lista.',
+        text: 'Clique nos três pontinhos ao lado do nome de uma lista para Renomear ou Excluir a lista.',
         images: [img(3)],
       },
       {
@@ -84,14 +84,14 @@ export const TUTORIAL_TOPICS: TutorialTopic[] = [
   },
   {
     id: 'extrato',
-    title: 'Importar Extrato',
+    title: 'Importar',
     steps: [
       {
-        text: 'Escolha, no painel à esquerda, o banco para o qual deseja importar o extrato.',
+        text: 'A tela Importar tem duas abas no topo: Extrato e Fatura. Na aba Extrato, uma explicação mostra os arquivos aceitos: OFX, o formato mais confiável, ou CSV, que depende do layout de cada banco. Escolha o banco em uma lista com os bancos cadastrados, para o extrato ir para o banco certo. O saldo atual é opcional: se informado, atualiza o saldo do banco ao salvar. Depois, arraste o arquivo para a área pontilhada ou clique em “Selecionar arquivo”, confira a prévia dos lançamentos e clique em “Salvar Lançamentos”. Cada importação substitui o extrato anterior daquele banco.',
         images: [img(8)],
       },
       {
-        text: 'Arraste o arquivo do extrato para a área pontilhada ou clique em "Selecionar arquivo" para escolher no seu computador. São aceitos arquivos .csv e .ofx. Antes de importar, o sistema pergunta o seu saldo atual nesse banco; depois de informado, o extrato é lido e uma prévia dos lançamentos é exibida, com um botão "Salvar Lançamento" para confirmar a importação.',
+        text: 'Na aba Fatura, escolha o cartão de crédito em uma lista que mostra o nome do cartão, o banco a que ele pertence e a cor dele. O limite total do cartão é obrigatório e, ao salvar, atualiza o cadastro do cartão. Se as compras da fatura passarem do limite informado, o sistema avisa e volta para a tela de importar, para você corrigir o limite. Arraste a fatura exportada pelo banco (.csv ou .ofx) para a área pontilhada ou clique em “Selecionar arquivo”. O sistema reconhece as colunas de data, descrição e valor em reais, datas sem ano e parcelas, e ignora linhas de saldo anterior e de resumo. Cada importação substitui a fatura anterior daquele cartão.',
         images: [img(9)],
       },
     ],
@@ -101,15 +101,19 @@ export const TUTORIAL_TOPICS: TutorialTopic[] = [
     title: 'Finanças',
     steps: [
       {
-        text: 'A tela de Finanças mostra o banco selecionado, com o saldo atual, o cartão de crédito vinculado (limite, limite disponível, dias de fechamento e vencimento) e o extrato importado. Use as setas para navegar entre bancos e entre cartões.',
+        text: 'A tela de Finanças mostra o banco selecionado, com o saldo atual e o cartão de crédito vinculado (limite, limite disponível, dias de fechamento e vencimento). Use as setas para navegar entre bancos e entre cartões.',
         images: [img(10)],
+      },
+      {
+        text: 'Abaixo do banco e do cartão ficam duas seções lado a lado: Extrato, com o extrato importado do banco selecionado, e Fatura, com a fatura importada do cartão selecionado. Ao trocar de banco, o extrato muda; ao trocar de cartão, a fatura muda.',
+        images: [img(42)],
       },
       {
         text: 'Clique no valor do saldo para editá-lo diretamente.',
         images: [img(11)],
       },
       {
-        text: 'Clique nos três pontinhos no cabeçalho do banco para Renomear, Criar um novo banco, Excluir o Extrato importado ou Excluir o banco.',
+        text: 'Clique nos três pontinhos no cabeçalho do banco para Renomear, Criar um novo banco, Excluir o Extrato importado ou Excluir o banco (que também apaga o extrato e as faturas importados dele).',
         images: [img(12)],
       },
       {
@@ -117,7 +121,7 @@ export const TUTORIAL_TOPICS: TutorialTopic[] = [
         images: [img(13)],
       },
       {
-        text: 'Clique no ícone de engrenagem no cartão para Editar, Criar um novo cartão, ajustar o Limite Disponível manualmente ou Excluir o cartão.',
+        text: 'Clique no ícone de engrenagem no cartão para Editar, Criar um novo cartão, ajustar o Limite Disponível manualmente, Excluir a Fatura importada desse cartão ou Excluir o cartão.',
         images: [img(14)],
       },
       {
@@ -181,12 +185,16 @@ export const TUTORIAL_TOPICS: TutorialTopic[] = [
         images: [img(27)],
       },
       {
-        text: 'A aba Movimentações mostra, para cada banco, a proporção entre entradas e saídas registradas.',
+        text: 'A aba Extrato mostra, para cada banco, a proporção entre entradas e saídas registradas no extrato importado.',
         images: [img(28)],
       },
       {
-        text: 'A aba Cartões mostra, para cada cartão de crédito, quanto do limite já foi usado e quanto ainda está disponível.',
+        text: 'A aba Cartões em Simulações mostra, para cada cartão de crédito, quanto do limite já foi usado e quanto ainda está disponível em relação às simulações.',
         images: [img(29)],
+      },
+      {
+        text: 'A aba Faturas mostra um medidor para cada cartão de crédito, na cor do cartão, com a porcentagem do limite total que a fatura importada já usou, o valor usado e o limite do cartão. Só contam as compras da fatura lida; pagamentos e estornos não entram na soma. Um cartão sem fatura importada aparece com 0%.',
+        images: [img(41)],
       },
     ],
   },

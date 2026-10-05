@@ -284,7 +284,7 @@ function DeleteDialog({ onClose }: { onClose: () => void }) {
     <Dialog title="Excluir Conta" onClose={onClose}>
       <form className="auth-form" onSubmit={handleSubmit}>
         <p className="settings-current">
-          Todos os seus dados (bancos, cartões, simulações, extratos e avisos) serão apagados permanentemente. Essa
+          Todos os seus dados (bancos, cartões, simulações, extratos, faturas e avisos) serão apagados permanentemente. Essa
           ação não pode ser desfeita.
         </p>
         <label>

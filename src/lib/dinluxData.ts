@@ -64,6 +64,16 @@ export type StatementTransaction = {
   credit: boolean
 }
 
+export type InvoiceTransactionRecord = {
+  id: string
+  bankId: string
+  cardId: string
+  date: number
+  description: string
+  amount: number
+  credit: boolean
+}
+
 export type ShoppingList = {
   id: string
   title: string
@@ -177,6 +187,40 @@ export async function loadTransactions(uid: string, bankId: string): Promise<Sta
     return {
       id: doc.id,
       bankId: data.bankId ?? '',
+      date: data.date ?? 0,
+      description: data.description ?? '',
+      amount: data.amount ?? 0,
+      credit: data.credit ?? false,
+    }
+  })
+}
+
+export async function loadInvoiceTransactions(uid: string, cardId: string): Promise<InvoiceTransactionRecord[]> {
+  const snapshot = await getDocs(
+    query(userCollection(uid, FirestoreCollections.INVOICE_TRANSACTIONS), where('cardId', '==', cardId)),
+  )
+  return snapshot.docs.map((doc) => {
+    const data = doc.data()
+    return {
+      id: doc.id,
+      bankId: data.bankId ?? '',
+      cardId: data.cardId ?? '',
+      date: data.date ?? 0,
+      description: data.description ?? '',
+      amount: data.amount ?? 0,
+      credit: data.credit ?? false,
+    }
+  })
+}
+
+export async function loadAllInvoiceTransactions(uid: string): Promise<InvoiceTransactionRecord[]> {
+  const snapshot = await getDocs(userCollection(uid, FirestoreCollections.INVOICE_TRANSACTIONS))
+  return snapshot.docs.map((doc) => {
+    const data = doc.data()
+    return {
+      id: doc.id,
+      bankId: data.bankId ?? '',
+      cardId: data.cardId ?? '',
       date: data.date ?? 0,
       description: data.description ?? '',
       amount: data.amount ?? 0,

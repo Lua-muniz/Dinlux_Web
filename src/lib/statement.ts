@@ -2,6 +2,7 @@ import { collection, doc, writeBatch } from 'firebase/firestore'
 import { db } from './firebase'
 import { FirestoreCollections } from './firestoreCollections'
 import { deleteStatement } from './finance'
+import { looksLikeOfx } from './invoiceParser'
 
 const BATCH_LIMIT = 400
 
@@ -174,11 +175,14 @@ export function parseOfx(text: string): ParseResult {
   return { ok: true, transactions, bankCode }
 }
 
+const UNSUPPORTED_EXTENSIONS = ['pdf', 'xls', 'xlsx', 'xlsm', 'doc', 'docx', 'zip', 'rar', '7z', 'png', 'jpg', 'jpeg', 'gif', 'webp', 'heic']
+
 export function parseStatementFile(fileName: string, text: string): ParseResult {
-  const lower = fileName.toLowerCase()
-  if (lower.endsWith('.ofx')) return parseOfx(text)
-  if (lower.endsWith('.csv')) return parseCsv(text)
-  return { ok: false, error: 'Formato de arquivo não suportado. Selecione um arquivo .csv ou .ofx.' }
+  const extension = fileName.toLowerCase().split('.').pop() ?? ''
+  if (UNSUPPORTED_EXTENSIONS.includes(extension)) {
+    return { ok: false, error: 'Formato de arquivo não suportado. Selecione um arquivo .csv ou .ofx.' }
+  }
+  return looksLikeOfx(text) ? parseOfx(text) : parseCsv(text)
 }
 
 export async function readFileText(file: File): Promise<string> {

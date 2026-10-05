@@ -5,6 +5,7 @@ export const FirestoreCollections = {
   SIMULATION_ENTRIES: 'simulationEntries',
   SIMULATION_GROUPS: 'simulationGroups',
   STATEMENT_TRANSACTIONS: 'statementTransactions',
+  INVOICE_TRANSACTIONS: 'invoiceTransactions',
   LISTS: 'lists',
   LIST_ITEMS: 'listItems',
 } as const

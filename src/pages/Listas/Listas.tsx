@@ -1,15 +1,14 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { formatCurrency } from '../../components/Charts/Charts'
-import { loadBanks, loadListItems, loadLists, type Bank, type ShoppingList, type ShoppingListItem } from '../../lib/dinluxData'
+import { loadListItems, loadLists, type ShoppingList, type ShoppingListItem } from '../../lib/dinluxData'
 import { addItem, createList, deleteList, deleteItem, renameList, setItemDone, updateItem } from '../../lib/lists'
-import { updateBankDebit, saveCards } from '../../lib/finance'
 import { ConfirmDialog, TextDialog } from '../Finance/FinanceDialogs'
-import { ItemFormDialog, LaunchDialog } from './ListasDialogs'
+import { ItemFormDialog } from './ListasDialogs'
 import DropdownMenu, { type DropdownMenuItem } from '../../components/DropdownMenu/DropdownMenu'
 import './Listas.css'
 
-type Dialog = 'newList' | 'renameList' | 'deleteList' | 'newItem' | 'editItem' | 'deleteItem' | 'launch'
+type Dialog = 'newList' | 'renameList' | 'deleteList' | 'newItem' | 'editItem' | 'deleteItem'
 
 const DOTS = 'M5 12h.01M12 12h.01M19 12h.01'
 const PLUS = 'M12 5v14M5 12h14'
@@ -36,7 +35,6 @@ export default function Listas() {
   const { user } = useAuth()
   const uid = user?.uid
   const [lists, setLists] = useState<ShoppingList[]>([])
-  const [banks, setBanks] = useState<Bank[]>([])
   const [status, setStatus] = useState<'loading' | 'error' | 'ready'>('loading')
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [items, setItems] = useState<ShoppingListItem[] | null>(null)
@@ -46,9 +44,8 @@ export default function Listas() {
   const reloadLists = useCallback(async () => {
     if (!uid) return
     try {
-      const [loadedLists, loadedBanks] = await Promise.all([loadLists(uid), loadBanks(uid)])
+      const loadedLists = await loadLists(uid)
       setLists(loadedLists)
-      setBanks(loadedBanks)
       setStatus('ready')
     } catch {
       setStatus('error')
@@ -102,10 +99,8 @@ export default function Listas() {
   const subtotal = (item: ShoppingListItem) => (item.price ?? 0) * (item.quantity ?? 1)
   const total = pricedItems.reduce((sum, item) => sum + subtotal(item), 0)
   const spent = pricedItems.filter((item) => item.done).reduce((sum, item) => sum + subtotal(item), 0)
-  const hasPricedDoneItems = pricedItems.some((item) => item.done)
 
   const listMenu = (list: ShoppingList): DropdownMenuItem[] => [
-    { label: 'Lançar', onSelect: () => { setSelectedId(list.id); setDialog('launch') } },
     { label: 'Renomear', onSelect: () => { setSelectedId(list.id); setDialog('renameList') } },
     { label: 'Excluir', danger: true, onSelect: () => { setSelectedId(list.id); setDialog('deleteList') } },
   ]
@@ -285,28 +280,6 @@ export default function Listas() {
           onConfirm={async () => {
             await deleteItem(uid, activeItem.id)
             await reloadItems()
-          }}
-        />
-      )}
-
-      {selectedList && dialog === 'launch' && (
-        <LaunchDialog
-          banks={banks}
-          total={spent}
-          onClose={closeDialog}
-          onLaunch={async (bankId, cardId) => {
-            if (!hasPricedDoneItems) throw new Error('Não há itens marcados e com preço para lançar.')
-            const bank = banks.find((item) => item.id === bankId)
-            if (!bank) throw new Error('Banco não encontrado.')
-            if (!cardId) {
-              await updateBankDebit(uid, bankId, bank.debit - spent)
-            } else {
-              const updatedCards = bank.cards.map((card) =>
-                card.id === cardId ? { ...card, usedAmount: card.usedAmount + spent } : card,
-              )
-              await saveCards(uid, bankId, updatedCards)
-            }
-            await reloadLists()
           }}
         />
       )}

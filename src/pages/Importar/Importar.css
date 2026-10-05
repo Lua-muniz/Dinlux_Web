@@ -1,0 +1,116 @@
+.importar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+}
+
+.importar-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 30px;
+  background: var(--color-black);
+}
+
+.importar-tabs button {
+  padding: 9px 28px;
+  border: none;
+  border-radius: 30px;
+  background: transparent;
+  color: var(--color-white);
+  font-size: 14px;
+  font-weight: 700;
+  opacity: 0.6;
+  cursor: pointer;
+}
+
+.importar-tabs button.active {
+  opacity: 1;
+  color: var(--color-black);
+  background: var(--color-cyan);
+}
+
+.importar-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 760px;
+  padding: 24px;
+}
+
+.importar-form {
+  gap: 18px;
+}
+
+.importar-explanation {
+  font-size: 14px;
+  line-height: 1.5;
+  opacity: 0.85;
+}
+
+.importar-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.importar-label {
+  font-size: 13px;
+  font-weight: 700;
+  opacity: 0.9;
+}
+
+.importar-help {
+  font-size: 12px;
+  opacity: 0.65;
+}
+
+.importar-dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  padding: 32px 24px;
+  border: 2px dashed rgba(255, 255, 255, 0.25);
+  border-radius: var(--radius-md);
+  text-align: center;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.importar-dropzone.drag-over {
+  border-color: var(--color-cyan);
+  background: rgba(2, 230, 254, 0.08);
+}
+
+.importar-dropzone-hint {
+  font-size: 13px;
+  opacity: 0.65;
+}
+
+.importar-file-input {
+  display: none;
+}
+
+.importar-success {
+  text-align: center;
+  color: var(--color-income);
+}
+
+.importar-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 16px;
+  font-size: 14px;
+}
+
+.importar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}

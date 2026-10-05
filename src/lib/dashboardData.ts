@@ -1,5 +1,6 @@
 import {
   loadActiveEntries,
+  loadAllInvoiceTransactions,
   loadBanks,
   loadTransactions,
   type SimulationEntry,
@@ -122,6 +123,32 @@ export async function loadCardsChart(uid: string): Promise<CardDonut[]> {
         available: Math.max(rawAvailable, 0),
         closingDay: card.closingDay,
         dueDay: card.dueDay,
+      }
+    }),
+  )
+}
+
+export type InvoiceGauge = {
+  cardLabel: string
+  bankName: string
+  colorSourceId: string
+  used: number
+  limit: number
+  hasInvoice: boolean
+}
+
+export async function loadInvoicesChart(uid: string): Promise<InvoiceGauge[]> {
+  const [banks, invoices] = await Promise.all([loadBanks(uid), loadAllInvoiceTransactions(uid)])
+  return banks.flatMap((bank) =>
+    bank.cards.map((card) => {
+      const lines = invoices.filter((line) => line.cardId === card.id)
+      return {
+        cardLabel: card.label,
+        bankName: bank.name,
+        colorSourceId: card.id,
+        used: lines.filter((line) => !line.credit).reduce((sum, line) => sum + Math.abs(line.amount), 0),
+        limit: card.limit,
+        hasInvoice: lines.length > 0,
       }
     }),
   )

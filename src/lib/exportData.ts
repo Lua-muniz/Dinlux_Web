@@ -13,6 +13,7 @@ export type ExportedData = {
   lancamentos: Raw[]
   grupos: Raw[]
   extrato: Raw[]
+  faturas: Raw[]
   listas: Raw[]
   itensDeLista: Raw[]
 }
@@ -24,12 +25,13 @@ async function loadSubcollection(uid: string, name: string): Promise<Raw[]> {
 
 export async function loadAllUserData(uid: string, email: string): Promise<ExportedData> {
   const userDoc = (await getDoc(doc(db, FirestoreCollections.USERS, uid))).data()
-  const [bancos, simulacoes, lancamentos, grupos, extrato, listas, itensDeLista] = await Promise.all([
+  const [bancos, simulacoes, lancamentos, grupos, extrato, faturas, listas, itensDeLista] = await Promise.all([
     loadSubcollection(uid, FirestoreCollections.BANKS),
     loadSubcollection(uid, FirestoreCollections.SIMULATIONS),
     loadSubcollection(uid, FirestoreCollections.SIMULATION_ENTRIES),
     loadSubcollection(uid, FirestoreCollections.SIMULATION_GROUPS),
     loadSubcollection(uid, FirestoreCollections.STATEMENT_TRANSACTIONS),
+    loadSubcollection(uid, FirestoreCollections.INVOICE_TRANSACTIONS),
     loadSubcollection(uid, FirestoreCollections.LISTS),
     loadSubcollection(uid, FirestoreCollections.LIST_ITEMS),
   ])
@@ -42,13 +44,16 @@ export async function loadAllUserData(uid: string, email: string): Promise<Expor
     lancamentos,
     grupos,
     extrato,
+    faturas,
     listas,
     itensDeLista,
   }
 }
 
 const dateTimeFormat = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
-const dateFormat = new Intl.DateTimeFormat('pt-BR')
+// Datas de extrato/fatura importados ficam à meia-noite UTC; formatar no fuso local mostraria o dia
+// anterior no Brasil
+const dateFormat = new Intl.DateTimeFormat('pt-BR', { timeZone: 'UTC' })
 
 function formatDateTime(millis: number): string {
   return dateTimeFormat.format(new Date(millis)).replace(',', '')
@@ -134,6 +139,17 @@ export function buildJson(data: ExportedData): string {
   root.extrato = data.extrato.map((transaction) => ({
     id: transaction.id,
     bancoId: transaction.bankId ?? '',
+    data: formatDate(transaction.date ?? 0),
+    descricao: transaction.description ?? '',
+    valor: transaction.amount ?? 0,
+    recebido: transaction.credit ?? false,
+    importadoEm: formatDateTime(transaction.importedAt ?? 0),
+  }))
+
+  root.faturas = data.faturas.map((transaction) => ({
+    id: transaction.id,
+    bancoId: transaction.bankId ?? '',
+    cartaoId: transaction.cardId ?? '',
     data: formatDate(transaction.date ?? 0),
     descricao: transaction.description ?? '',
     valor: transaction.amount ?? 0,
@@ -248,6 +264,26 @@ export async function buildPdf(data: ExportedData): Promise<Blob> {
       `${formatDate(transaction.date ?? 0)}, ${transaction.description}, ` +
         `${transaction.credit ? 'recebido' : 'gasto'} ${formatMoney(Math.abs(transaction.amount ?? 0))}`,
     )
+  }
+  gap()
+
+  section('Faturas de Cartão Importadas')
+  if (data.faturas.length === 0) line('Nenhuma fatura importada.')
+  const invoicesByCard = new Map<string, Raw[]>()
+  for (const transaction of data.faturas) {
+    invoicesByCard.set(transaction.cardId ?? '', [...(invoicesByCard.get(transaction.cardId ?? '') ?? []), transaction])
+  }
+  for (const [cardId, transactions] of invoicesByCard) {
+    const bank = data.bancos.find((item) => (item.cards ?? []).some((card: Raw) => card.id === cardId))
+    const card: Raw | undefined = (bank?.cards ?? []).find((item: Raw) => item.id === cardId)
+    subtitle(card ? `${card.label} (${bank?.name ?? ''})` : 'Cartão removido')
+    for (const transaction of [...transactions].sort((a, b) => (b.date ?? 0) - (a.date ?? 0))) {
+      line(
+        `${formatDate(transaction.date ?? 0)}, ${transaction.description}, ` +
+          `${transaction.credit ? 'crédito' : 'compra'} ${formatMoney(Math.abs(transaction.amount ?? 0))}`,
+      )
+    }
+    gap()
   }
   gap()
 

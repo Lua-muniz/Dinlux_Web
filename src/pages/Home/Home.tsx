@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
-import { BarChart, DonutChart, formatCurrency, LineChart, PieChart } from '../../components/Charts/Charts'
+import { BarChart, DonutChart, formatCurrency, GaugeChart, LineChart, PieChart } from '../../components/Charts/Charts'
 import { colorFor, resolveColors } from '../../lib/entityColors'
 import {
   loadCardsChart,
+  loadInvoicesChart,
+  type InvoiceGauge,
   loadMovementsChart,
   loadSimulationsChart,
   type BankPie,
@@ -12,12 +14,13 @@ import {
 } from '../../lib/dashboardData'
 import './Home.css'
 
-type Tab = 'simulacoes' | 'movimentacoes' | 'cartoes'
+type Tab = 'simulacoes' | 'movimentacoes' | 'cartoes' | 'faturas'
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'simulacoes', label: 'Simulações' },
-  { id: 'movimentacoes', label: 'Movimentações' },
-  { id: 'cartoes', label: 'Cartões' },
+  { id: 'movimentacoes', label: 'Extrato' },
+  { id: 'cartoes', label: 'Cartões em Simulações' },
+  { id: 'faturas', label: 'Faturas' },
 ]
 
 type Loaded<T> = { status: 'loading' } | { status: 'error' } | { status: 'ready'; data: T }
@@ -185,6 +188,41 @@ function CardsContent({ cards }: { cards: CardDonut[] }) {
   )
 }
 
+function InvoicesTab() {
+  const state = useLoaded(loadInvoicesChart)
+
+  return (
+    <Status state={state} empty={(cards: InvoiceGauge[]) => cards.length === 0}>
+      {(cards) => <InvoicesContent cards={cards} />}
+    </Status>
+  )
+}
+
+function InvoicesContent({ cards }: { cards: InvoiceGauge[] }) {
+  const colors = useMemo(() => resolveColors(cards.map((card) => card.colorSourceId)), [cards])
+
+  return (
+    <div className="home-grid">
+      {cards.map((card) => {
+        const color = colorFor(colors, card.colorSourceId)
+        const percent = card.limit > 0 ? (card.used / card.limit) * 100 : 0
+        return (
+          <ChartCard key={card.colorSourceId} title={card.cardLabel} subtitle={card.bankName} color={color}>
+            <div className="home-gauge">
+              <GaugeChart percent={percent} color={color} />
+              <span>
+                {card.hasInvoice
+                  ? `Usado: ${formatCurrency(card.used)} (${Math.round(percent)}% do limite de ${formatCurrency(card.limit)})`
+                  : 'Nenhuma fatura importada para este cartão'}
+              </span>
+            </div>
+          </ChartCard>
+        )
+      })}
+    </div>
+  )
+}
+
 export default function Home() {
   const [tab, setTab] = useState<Tab>('simulacoes')
 
@@ -208,6 +246,7 @@ export default function Home() {
       {tab === 'simulacoes' && <SimulationsTab />}
       {tab === 'movimentacoes' && <MovementsTab />}
       {tab === 'cartoes' && <CardsTab />}
+      {tab === 'faturas' && <InvoicesTab />}
     </div>
   )
 }
