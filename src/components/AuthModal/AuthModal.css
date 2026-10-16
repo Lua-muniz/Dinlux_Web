@@ -8,6 +8,7 @@
   justify-content: center;
   padding: 16px;
   z-index: 100;
+  overscroll-behavior: contain;
 }
 
 .auth-modal {
@@ -15,7 +16,9 @@
   width: 100%;
   max-width: 440px;
   max-height: calc(100vh - 32px);
+  max-height: calc(100dvh - 32px);
   overflow-y: auto;
+  overflow-x: hidden;
   background: var(--color-gray);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--radius-lg);
@@ -162,4 +165,22 @@
   font-size: 13px;
   cursor: pointer;
   text-align: center;
+}
+
+@media (max-width: 640px) {
+  .auth-modal {
+    padding: 28px 18px 20px;
+    border-radius: var(--radius-md);
+  }
+
+  .auth-modal-title {
+    font-size: 19px;
+    padding-inline: 24px;
+  }
+
+  .auth-form input[type='email'],
+  .auth-form input[type='password'],
+  .auth-form input[type='text'] {
+    font-size: 16px;
+  }
 }

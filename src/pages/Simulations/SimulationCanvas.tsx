@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type MouseEvent as ReactMouseEvent, type WheelEvent as ReactWheelEvent } from 'react'
+import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent, type WheelEvent as ReactWheelEvent } from 'react'
 import type { SimulationEntry } from '../../lib/dinluxData'
 import type { SimulationGroup } from '../../lib/simulations'
 import { buildCanvasLayout, isCompatibleGroup, CANVAS_GROUP_LABEL_RESERVE, CANVAS_NODE_TEXT_SIZE_TWO_LINES } from './canvasLayout'
@@ -7,6 +7,7 @@ import './SimulationCanvas.css'
 const MIN_SCALE = 0.5
 const MAX_SCALE = 3
 const DRAG_THRESHOLD_PX = 4
+const TOUCH_DRAG_THRESHOLD_PX = 10
 
 export default function SimulationCanvas({
   groups,
@@ -29,11 +30,14 @@ export default function SimulationCanvas({
   const [draggingId, setDraggingId] = useState<string | null>(null)
   const [dropTargetId, setDropTargetId] = useState<string | null>(null)
   const panState = useRef<{ x: number; y: number; startX: number; startY: number } | null>(null)
+  const activePointers = useRef(new Map<number, { x: number; y: number }>())
+  const pinchState = useRef<{ distance: number; scale: number; contentX: number; contentY: number } | null>(null)
 
   const nodeDragState = useRef<{
     entry: SimulationEntry
     startClientX: number
     startClientY: number
+    threshold: number
     moved: boolean
   } | null>(null)
 
@@ -67,11 +71,11 @@ export default function SimulationCanvas({
   useEffect(() => {
     if (!draggingId) return
 
-    function handleMove(event: MouseEvent) {
+    function handleMove(event: PointerEvent) {
       setDragPoint({ x: event.clientX, y: event.clientY })
       const state = nodeDragState.current
       if (!state) return
-      if (!state.moved && Math.hypot(event.clientX - state.startClientX, event.clientY - state.startClientY) > DRAG_THRESHOLD_PX) {
+      if (!state.moved && Math.hypot(event.clientX - state.startClientX, event.clientY - state.startClientY) > state.threshold) {
         state.moved = true
       }
       const point = contentPointFromClient(event.clientX, event.clientY)
@@ -79,7 +83,7 @@ export default function SimulationCanvas({
       setDropTargetId(group && isCompatibleGroup(state.entry, group) ? group.id : null)
     }
 
-    function handleUp(event: MouseEvent) {
+    function handleUp(event: PointerEvent) {
       const state = nodeDragState.current
       if (state) {
         const point = contentPointFromClient(event.clientX, event.clientY)
@@ -90,17 +94,23 @@ export default function SimulationCanvas({
           onNodeClick(state.entry)
         }
       }
+      endNodeDrag()
+    }
+
+    function endNodeDrag() {
       nodeDragState.current = null
       setDraggingId(null)
       setDropTargetId(null)
       setDragPoint(null)
     }
 
-    window.addEventListener('mousemove', handleMove)
-    window.addEventListener('mouseup', handleUp)
+    window.addEventListener('pointermove', handleMove)
+    window.addEventListener('pointerup', handleUp)
+    window.addEventListener('pointercancel', endNodeDrag)
     return () => {
-      window.removeEventListener('mousemove', handleMove)
-      window.removeEventListener('mouseup', handleUp)
+      window.removeEventListener('pointermove', handleMove)
+      window.removeEventListener('pointerup', handleUp)
+      window.removeEventListener('pointercancel', endNodeDrag)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [draggingId])
@@ -111,12 +121,48 @@ export default function SimulationCanvas({
     setTransform((current) => ({ ...current, scale: Math.min(MAX_SCALE, Math.max(MIN_SCALE, current.scale * factor)) }))
   }
 
-  function handleMouseDown(event: ReactMouseEvent) {
-    if ((event.target as HTMLElement).closest('.sim-node, .sim-group-label')) return
-    panState.current = { x: transform.x, y: transform.y, startX: event.clientX, startY: event.clientY }
+  function startPan(clientX: number, clientY: number) {
+    const t = transformRef.current
+    panState.current = { x: t.x, y: t.y, startX: clientX, startY: clientY }
   }
 
-  function handleMouseMove(event: ReactMouseEvent) {
+  function startPinch() {
+    const [a, b] = [...activePointers.current.values()]
+    const t = transformRef.current
+    const center = contentPointFromClient((a.x + b.x) / 2, (a.y + b.y) / 2)
+    panState.current = null
+    pinchState.current = { distance: Math.hypot(a.x - b.x, a.y - b.y) || 1, scale: t.scale, contentX: center.x, contentY: center.y }
+  }
+
+  function handlePointerDown(event: ReactPointerEvent) {
+    if ((event.target as HTMLElement).closest('.sim-node, .sim-group-label')) return
+    if (event.pointerType === 'mouse' && event.button !== 0) return
+    try {
+      viewportRef.current?.setPointerCapture(event.pointerId)
+    } catch {
+      // Sem captura o gesto continua funcionando enquanto o dedo estiver sobre o canvas
+    }
+    activePointers.current.set(event.pointerId, { x: event.clientX, y: event.clientY })
+    if (activePointers.current.size === 1) startPan(event.clientX, event.clientY)
+    else if (activePointers.current.size === 2) startPinch()
+  }
+
+  function handlePointerMove(event: ReactPointerEvent) {
+    if (!activePointers.current.has(event.pointerId)) return
+    activePointers.current.set(event.pointerId, { x: event.clientX, y: event.clientY })
+
+    const pinch = pinchState.current
+    if (pinch && activePointers.current.size >= 2) {
+      const [a, b] = [...activePointers.current.values()]
+      const rect = viewportRef.current?.getBoundingClientRect()
+      if (!rect) return
+      const scale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, (pinch.scale * Math.hypot(a.x - b.x, a.y - b.y)) / pinch.distance))
+      const midX = (a.x + b.x) / 2 - rect.left
+      const midY = (a.y + b.y) / 2 - rect.top
+      setTransform({ scale, x: midX - pinch.contentX * scale, y: midY - pinch.contentY * scale })
+      return
+    }
+
     const state = panState.current
     if (!state) return
     const dx = event.clientX - state.startX
@@ -124,14 +170,26 @@ export default function SimulationCanvas({
     setTransform((current) => ({ ...current, x: state.x + dx, y: state.y + dy }))
   }
 
-  function endPan() {
-    panState.current = null
+  function handlePointerEnd(event: ReactPointerEvent) {
+    if (!activePointers.current.delete(event.pointerId)) return
+    pinchState.current = null
+    const remaining = [...activePointers.current.values()]
+    if (remaining.length === 1) startPan(remaining[0].x, remaining[0].y)
+    else panState.current = null
   }
 
-  function handleNodeMouseDown(entry: SimulationEntry, event: ReactMouseEvent) {
+  function handleNodePointerDown(entry: SimulationEntry, event: ReactPointerEvent) {
     event.stopPropagation()
-    if (event.button !== 0) return
-    nodeDragState.current = { entry, startClientX: event.clientX, startClientY: event.clientY, moved: false }
+    if (event.pointerType === 'mouse' && event.button !== 0) return
+    const target = event.target as Element
+    if (target.hasPointerCapture?.(event.pointerId)) target.releasePointerCapture(event.pointerId)
+    nodeDragState.current = {
+      entry,
+      startClientX: event.clientX,
+      startClientY: event.clientY,
+      threshold: event.pointerType === 'mouse' ? DRAG_THRESHOLD_PX : TOUCH_DRAG_THRESHOLD_PX,
+      moved: false,
+    }
     setDraggingId(entry.id)
     setDragPoint({ x: event.clientX, y: event.clientY })
   }
@@ -146,10 +204,10 @@ export default function SimulationCanvas({
       ref={viewportRef}
       className="sim-canvas-viewport"
       onWheel={handleWheel}
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={endPan}
-      onMouseLeave={endPan}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerEnd}
+      onPointerCancel={handlePointerEnd}
     >
       <div
         className="sim-canvas-content"
@@ -200,7 +258,7 @@ export default function SimulationCanvas({
             <div
               key={node.entry.id}
               className="sim-node"
-              onMouseDown={(event) => handleNodeMouseDown(node.entry, event)}
+              onPointerDown={(event) => handleNodePointerDown(node.entry, event)}
               style={{
                 left: node.x - node.diameter / 2,
                 top: node.y - node.diameter / 2,

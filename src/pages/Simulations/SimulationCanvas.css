@@ -57,6 +57,8 @@
   padding: 0 12px;
   text-align: center;
   user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 
 .sim-node-ghost {

@@ -6,10 +6,12 @@
   font-size: 14px;
   opacity: 0.8;
   line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 
 .settings-terms {
   height: 320px;
+  max-height: 50dvh;
   margin-bottom: 16px;
 }
 
